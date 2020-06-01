@@ -1,0 +1,30 @@
+profiles
+    lens
+        centre
+            centre_0                                                                      GaussianPrior, mean = 0.0, sigma = 0.3
+            centre_1                                                                      GaussianPrior, mean = 0.0, sigma = 0.3
+        axis_ratio                                                                        UniformPrior, lower_limit = 0.2, upper_limit = 1.0
+        phi                                                                               UniformPrior, lower_limit = 0.0, upper_limit = 180.0
+        einstein_radius                                                                   UniformPrior, lower_limit = 0.0, upper_limit = 4.0
+        slope                                                                             UniformPrior, lower_limit = 1.5, upper_limit = 3.0
+    src_model_1
+        centre
+            centre_0                                                                      GaussianPrior, mean = 0.0, sigma = 0.25
+            centre_1                                                                      GaussianPrior, mean = 0.0, sigma = 0.25
+        axis_ratio                                                                        UniformPrior, lower_limit = 0.2, upper_limit = 1.0
+        phi                                                                               UniformPrior, lower_limit = 0.0, upper_limit = 180.0
+        intensity                                                                         LogUniformPrior, lower_limit = 4.9999999999999996e-06, upper_limit = 0.0005
+        effective_radius                                                                  UniformPrior, lower_limit = 0.0, upper_limit = 4.0
+        sersic_index                                                                      UniformPrior, lower_limit = 0.5, upper_limit = 8.0
+    src_model_2
+        centre
+            centre_0                                                                      GaussianPrior, mean = 0.0, sigma = 0.3
+            centre_1                                                                      GaussianPrior, mean = 0.0, sigma = 0.3
+        z_centre                                                                          GaussianPrior, mean = 16.0, sigma = 2.0
+        intensity                                                                         LogUniformPrior, lower_limit = 0.01, upper_limit = 100.0
+        effective_radius                                                                  UniformPrior, lower_limit = 0.0, upper_limit = 4.0
+        inclination                                                                       UniformPrior, lower_limit = 0.0, upper_limit = 90.0
+        phi                                                                               UniformPrior, lower_limit = 0.0, upper_limit = 180.0
+        turnover_radius                                                                   UniformPrior, lower_limit = 0.0, upper_limit = 1.0
+        maximum_velocity                                                                  UniformPrior, lower_limit = 0.0, upper_limit = 400.0
+        velocity_dispersion                                                               UniformPrior, lower_limit = 0.0, upper_limit = 100.0

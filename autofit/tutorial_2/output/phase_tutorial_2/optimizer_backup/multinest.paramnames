@@ -1,0 +1,10 @@
+profiles_model_1_centre_0                                             y_{\mathrm{kin1}}
+profiles_model_1_centre_1                                             x_{\mathrm{kin1}}
+profiles_model_1_z_centre                                             z_centre_{\mathrm{kin1}}
+profiles_model_1_intensity                                            I_{\mathrm{kin1}}
+profiles_model_1_effective_radius                                     R_{\mathrm{kin1}}
+profiles_model_1_inclination                                          inclination_{\mathrm{kin1}}
+profiles_model_1_phi                                                  \phi_{\mathrm{kin1}}
+profiles_model_1_turnover_radius                                      turnover_radius_{\mathrm{kin1}}
+profiles_model_1_maximum_velocity                                     maximum_velocity_{\mathrm{kin1}}
+profiles_model_1_velocity_dispersion                                  velocity_dispersion_{\mathrm{kin1}}

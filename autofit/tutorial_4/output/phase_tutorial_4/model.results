@@ -1,0 +1,35 @@
+Maximum Likelihood                                                                        -31800326.80871296
+
+Most Likely Model:
+
+profiles
+    model_1
+        axis_ratio                                                                        0.482
+        phi                                                                               105.669
+        intensity                                                                         0.000
+        effective_radius                                                                  0.321
+        sersic_index                                                                      5.923
+        centre
+            centre_0                                                                      -0.211
+            centre_1                                                                      0.494
+
+ WARNING: The chains have not converged enough to compute a PDF and model errors. 
+ The model below over estimates errors. 
+
+
+
+Most probable model (1.0 sigma limits):
+
+profiles
+    model_1
+        axis_ratio                                                                        0.482 (0.205, 0.989)
+        phi                                                                               105.669 (4.916, 179.681)
+        intensity                                                                         0.000 (0.000, 98419.743)
+        effective_radius                                                                  0.321 (0.126, 3.967)
+        sersic_index                                                                      5.923 (0.617, 7.774)
+        centre
+            centre_0                                                                      -0.211 (-0.508, 0.552)
+            centre_1                                                                      0.494 (-0.223, 1.071)
+
+instances
+

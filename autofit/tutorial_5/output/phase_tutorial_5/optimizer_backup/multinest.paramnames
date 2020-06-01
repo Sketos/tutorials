@@ -1,0 +1,17 @@
+profiles_model_1_axis_ratio                                           q_{\mathrm{l27}}
+profiles_model_1_phi                                                  \phi_{\mathrm{l27}}
+profiles_model_1_effective_radius_value                               R_{\mathrm{l27}}
+profiles_model_1_sersic_index                                         n_{\mathrm{l27}}
+profiles_model_1_centre_0                                             y_{\mathrm{l27}}
+profiles_model_1_centre_1                                             x_{\mathrm{l27}}
+profiles_model_1_intensity                                            I_{\mathrm{l27}}
+profiles_model_2_centre_0                                             y_{\mathrm{kin27}}
+profiles_model_2_centre_1                                             x_{\mathrm{kin27}}
+profiles_model_2_effective_radius                                     R_{\mathrm{kin27}}
+profiles_model_2_inclination                                          inclination_{\mathrm{kin27}}
+profiles_model_2_phi                                                  \phi_{\mathrm{kin27}}
+profiles_model_2_turnover_radius                                      turnover_radius_{\mathrm{kin27}}
+profiles_model_2_maximum_velocity                                     maximum_velocity_{\mathrm{kin27}}
+profiles_model_2_velocity_dispersion                                  velocity_dispersion_{\mathrm{kin27}}
+profiles_model_2_z_centre                                             z_centre_{\mathrm{kin27}}
+profiles_model_2_intensity                                            I_{\mathrm{kin27}}
