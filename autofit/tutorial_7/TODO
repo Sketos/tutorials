@@ -1,3 +1,7 @@
 
+URGENT:
+1) The DatasetFit function takes different shape data and model arrays...
+
+GENERAL:
 1) The z_mask is currently not being used, implement it ...
 2) The uv_mask is not properly defined.

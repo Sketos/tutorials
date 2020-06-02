@@ -17,7 +17,7 @@ from autoarray.operators.inversion import inversions as inv
 from src.grid.grid import Grid3D
 from src.mask.mask import Mask3D
 #from src.region.region import region
-from src.dataset.dataset import Dataset, MaskedDataset
+from src.dataset.dataset import Dataset, MaskedDataset, CubeDataset
 from src.model import profiles, mass_profiles
 from src.fit import (
     fit
@@ -113,7 +113,7 @@ uv_wavelengths = load_uv_wavelengths(
 n_channels = uv_wavelengths.shape[0]
 z_step_kms = 50.0 # NOTE: This does not correspond to the actual value of z_step_kms for this uv_wavelengths dataset
 
-
+# TODO: Make this a class
 def region(n, n_min, n_max, invert=False):
 
     mask = np.zeros(
@@ -127,6 +127,19 @@ def region(n, n_min, n_max, invert=False):
 
     return mask.astype(bool)
 
+
+
+# a = np.array([[0,2], [1,1], [2,3], [3,1]])
+# mask = np.full(
+#     shape=a.shape,
+#     fill_value=False
+# )
+# mask[0,1] = True
+# print(a.shape)
+# print(a)
+# print(mask)
+# #print(np.mean(a), np.average(a))
+# exit()
 
 if __name__ == "__main__":
 
@@ -247,6 +260,8 @@ if __name__ == "__main__":
     # )
     # exit()
 
+
+
     noise_map = np.random.normal(
         loc=0.0, scale=5.0 * 10**-1.0, size=visibilities.shape
     )
@@ -283,6 +298,8 @@ if __name__ == "__main__":
         xy_mask=xy_mask,
     )
     #exit()
+
+
 
     # pixelization_shape_0 = 20
     # pixelization_shape_1 = 20
@@ -344,10 +361,6 @@ if __name__ == "__main__":
         pixelization=al.pix.VoronoiMagnification,
         regularization=al.reg.Constant,
     )
-    #source.pixelization.shape.shape_0 = 20
-    #source.pixelization.shape.shape_1 = 20
-    #source.pixelization.shape = (15, 20)
-    #source.regularization.coefficient = 1.0
 
     source.pixelization.shape.shape_0 = af.UniformPrior(
         lower_limit=5, upper_limit=50
@@ -355,6 +368,9 @@ if __name__ == "__main__":
     source.pixelization.shape.shape_1 = af.UniformPrior(
         lower_limit=5, upper_limit=50
     )
+
+    #source.pixelization.shape = (15, 15)
+    #source.regularization.coefficient = 1.0
 
     lens.mass.centre_0 = 0.0
     lens.mass.centre_1 = 0.0

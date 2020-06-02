@@ -21,6 +21,9 @@ from src.fit import fit as f
 from src.phase import (
     visualizer,
 )
+from src.dataset.dataset import (
+    MaskedDatasetLite
+)
 
 sys.path.append(
     "{}/utils".format(os.environ["GitHub"])
@@ -80,10 +83,20 @@ class Analysis(af.Analysis):
         # )
         # exit()
 
+        # NOTE: The initialization of the lite masked datasets should happen
+        # at the phase level and be passed to analysis
         fits = []
-        for inversion in inversions:
+        for i, inversion in enumerate(inversions):
+
             fits.append(
-                self.fit_from_model_data_and_inversion(
+                self.fit_from_masked_dataset_model_data_and_inversion(
+                    masked_dataset=MaskedDatasetLite(
+                        visibilities=self.masked_dataset.visibilities[i],
+                        noise_map=self.masked_dataset.noise_map[i],
+                        noise_map_real_and_imag_averaged=self.masked_dataset.noise_map_real_and_imag_averaged[i],
+                        uv_mask=self.masked_dataset.uv_mask[i],
+                        uv_mask_real_and_imag_averaged=self.masked_dataset.uv_mask_real_and_imag_averaged[i]
+                    ),
                     model_data=inversion.mapped_reconstructed_visibilities,
                     inversion=inversion
                 )
@@ -102,11 +115,16 @@ class Analysis(af.Analysis):
             galaxies=instance.galaxies
         )
 
-        print(tracer.source_plane.pixelization.shape, tracer.source_plane.regularization.coefficient)
-        # exit()
-        # print(tracer.regularizations_of_planes)
-        # #list(map(lambda plane: plane.has_pixelization, self.planes))
-        # print(tracer.source_plane.regularization)
+        print(
+            "pix = {}".format(
+                tracer.source_plane.pixelization.shape
+            )
+        )
+        print(
+            "reg = {}".format(
+                tracer.source_plane.regularization.coefficient
+            )
+        )
 
         mappers_of_planes = tracer.mappers_of_planes_from_grid(
             grid=self.masked_dataset.grid_3d.grid_2d,
@@ -131,10 +149,10 @@ class Analysis(af.Analysis):
 
         return inversions
 
-    def fit_from_model_data_and_inversion(self, model_data, inversion):
+    def fit_from_masked_dataset_model_data_and_inversion(self, masked_dataset, model_data, inversion):
 
         return f.DatasetFit(
-            masked_dataset=self.masked_dataset,
+            masked_dataset=masked_dataset,
             model_data=model_data,
             inversion=inversion
         )
