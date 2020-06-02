@@ -60,7 +60,7 @@ class MaskedDataset:
 
         self.dataset = dataset
 
-        self.xy_mask = xy_mask
+        self.xy_mask = xy_mask # NOTE: rename to real_space_mask
 
         # NOTE: This should change and instead be initialized from mask
         if xy_mask.pixel_scales is not None:
@@ -74,6 +74,7 @@ class MaskedDataset:
 
         self.uv_wavelengths = dataset.uv_wavelengths
         self.visibilities = dataset.visibilities
+        self.noise_map = dataset.noise_map
 
         if uv_mask is None:
             self.uv_mask = np.full(
@@ -83,14 +84,15 @@ class MaskedDataset:
         else:
             self.uv_mask = uv_mask
 
-        # NOTE: We cant have real and imag being different, either both are True of both are False.
-        # TODO: If both real and imag are True then this is True, but if one is False use that for the averaging.
+        # TODO: Turn this into a function
         self.uv_mask_real_and_imag_averaged = np.full(
             shape=self.uv_mask.shape[:-1],
             fill_value=False
         )
-
-        self.noise_map = dataset.noise_map
+        for i in range(self.uv_mask.shape[0]):
+            for j in range(self.uv_mask.shape[1]):
+                if self.uv_mask[i, j, 0] == self.uv_mask[i, j, 1] == True:
+                    self.uv_mask_real_and_imag_averaged[i, j] = True
 
         self.noise_map_real_and_imag_averaged = np.average(
             a=self.noise_map, axis=-1

@@ -67,10 +67,9 @@ class Analysis(af.Analysis):
         # only use is that it has a grid3D associated with it) and work with the
         # region_masked_datasets
         # NOTE: region_masked_datasets[0] is the continuum and region_masked_datasets[1]
-        # is the line emission. 
+        # is the line emission.
         self.masked_dataset = masked_dataset
         self.region_masked_datasets = region_masked_datasets
-
 
         self.transformers = transformers
         self.transformer_continuum = transformer_continuum
@@ -182,6 +181,15 @@ class Analysis(af.Analysis):
                 )
 
                 j += 1
+        # autolens_plot_utils.plot_reconstructions_from_inversions(
+        #     inversions=inversions,
+        #     nrows=3,
+        #     ncols=5,
+        #     figsize=(20, 5),
+        #     xlim=(-1.5, 1.5),
+        #     ylim=(-1.5, 1.5),
+        # )
+        # exit()
 
         fit_continuum = self.fit_from_masked_dataset_model_data_and_inversion(
             masked_dataset=self.region_masked_datasets[0],
@@ -192,6 +200,7 @@ class Analysis(af.Analysis):
         fits = []
         for i, inversion in enumerate(inversions):
 
+            # NOTE: ugly ...
             fits.append(
                 self.fit_from_masked_dataset_model_data_and_inversion(
                     masked_dataset=MaskedDatasetLite(
@@ -214,10 +223,7 @@ class Analysis(af.Analysis):
         )
         #print(figure_of_merit_line)
 
-        figure_of_merit = np.add(
-            figure_of_merit_continuum,
-            figure_of_merit_line
-        )
+        figure_of_merit = figure_of_merit_continuum + figure_of_merit_line
         print(figure_of_merit)
 
         return figure_of_merit

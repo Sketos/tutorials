@@ -390,11 +390,14 @@ if __name__ == "__main__":
         lower_limit=5, upper_limit=50
     )
 
-    #source_1.pixelization.shape = (25, 25)
-    #source_1.regularization.coefficient = 10**5.0
-    #source_2.pixelization.shape = (25, 25)
-
     source_2.pixelization.shape = source_1.pixelization.shape
+
+    source_1.pixelization.shape = (15, 15)
+    source_1.regularization.coefficient = 10.0
+    source_2.pixelization.shape = (15, 15)
+    source_2.regularization.coefficient = 100.0
+
+
 
     lens.mass.centre_0 = 0.0
     lens.mass.centre_1 = 0.0
