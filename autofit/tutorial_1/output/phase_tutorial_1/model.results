@@ -1,0 +1,36 @@
+Bayesian Evidence                                                                         -16056790.33141744
+Maximum Likelihood                                                                        -542260.26573205
+
+Most Likely Model:
+
+profiles
+    model
+        intensity                                                                         0.068
+        centre
+            centre_0                                                                      0.005
+            centre_1                                                                      0.505
+        axis_ratio                                                                        0.694
+        phi                                                                               40.640
+        effective_radius                                                                  0.559
+        sersic_index                                                                      0.914
+
+ WARNING: The chains have not converged enough to compute a PDF and model errors. 
+ The model below over estimates errors. 
+
+
+
+Most probable model (1.0 sigma limits):
+
+profiles
+    model
+        intensity                                                                         0.068 (0.003, 0.576)
+        centre
+            centre_0                                                                      0.005 (-0.104, 0.156)
+            centre_1                                                                      0.505 (0.311, 0.603)
+        axis_ratio                                                                        0.694 (0.622, 0.905)
+        phi                                                                               40.640 (33.960, 56.598)
+        effective_radius                                                                  0.559 (0.256, 1.496)
+        sersic_index                                                                      0.914 (0.408, 1.501)
+
+instances
+

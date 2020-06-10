@@ -1,0 +1,53 @@
+Bayesian Evidence                                                                         -617929.85684690
+Maximum Likelihood                                                                        -398341.56273522
+
+Most Likely Model:
+
+profiles
+    lens
+        axis_ratio                                                                        0.843
+        phi                                                                               18.356
+        einstein_radius                                                                   1.006
+        centre
+            centre_0                                                                      -0.119
+            centre_1                                                                      0.188
+    src_model_1
+        axis_ratio                                                                        0.691
+        phi                                                                               37.220
+        effective_radius                                                                  1.312
+        sersic_index                                                                      2.608
+        centre
+            centre_0                                                                      0.038
+            centre_1                                                                      0.056
+        intensity                                                                         0.000
+
+ WARNING: The chains have not converged enough to compute a PDF and model errors. 
+ The model below over estimates errors. 
+
+
+
+Most probable model (1.0 sigma limits):
+
+profiles
+    lens
+        axis_ratio                                                                        0.843 (0.559, 0.994)
+        phi                                                                               18.356 (9.696, 117.343)
+        einstein_radius                                                                   1.006 (0.971, 1.071)
+        centre
+            centre_0                                                                      -0.119 (-0.271, 0.282)
+            centre_1                                                                      0.188 (-0.132, 0.263)
+    src_model_1
+        axis_ratio                                                                        0.691 (0.435, 0.997)
+        phi                                                                               37.220 (3.511, 178.626)
+        effective_radius                                                                  1.312 (0.199, 2.488)
+        sersic_index                                                                      2.608 (0.563, 3.376)
+        centre
+            centre_0                                                                      0.038 (-0.116, 0.091)
+            centre_1                                                                      0.056 (-0.100, 0.111)
+        intensity                                                                         0.000 (0.000, 0.000)
+
+instances
+
+profiles
+    lens
+        slope                                                                             2.0

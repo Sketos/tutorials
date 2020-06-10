@@ -43,7 +43,6 @@ class MaskedDataset:
         )
 
         self.data = dataset.data
-
         self.noise_map = dataset.noise_map
 
         self.z_step_kms = dataset.z_step_kms

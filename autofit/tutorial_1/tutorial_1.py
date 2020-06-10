@@ -162,15 +162,15 @@ if __name__ == "__main__":
 
     phase_name = "phase_tutorial_1"
     os.system(
-        "rm -r output/{}*".format(phase_name)
+        "rm -r output/{}".format(phase_name)
     )
     phase = ph.Phase(
         phase_name=phase_name,
         profiles=af.CollectionPriorModel(
             model=model
         ),
-        non_linear_class=af.Emcee
     )
+    #non_linear_class=af.Emcee
 
     phase.optimizer.constant_efficiency = True
     phase.optimizer.n_live_points = 100

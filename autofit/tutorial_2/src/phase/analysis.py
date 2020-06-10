@@ -25,6 +25,8 @@ class Analysis(af.Analysis):
             masked_dataset=self.masked_dataset, image_path=image_path
         )
 
+        self.n_tot = 0
+
     def fit(self, instance):
 
         start = time.time()
@@ -32,12 +34,20 @@ class Analysis(af.Analysis):
             instance=instance
         )
         end = time.time()
-        print(
-            "It tool t={} to compute the model".format(end - start)
-        )
+        # print(
+        #     "It tool t={} to compute the model".format(end - start)
+        # )
 
         fit = self.fit_from_model_data(model_data=model_data)
-        print(fit.likelihood)
+        # print(
+        #     "likelihood = {}".format(fit.likelihood)
+        # )
+
+        self.n_tot += 1
+        print(
+            "n = {}".format(self.n_tot)
+        )
+
         return fit.likelihood
 
     def model_data_from_instance(self, instance):

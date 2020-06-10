@@ -17,7 +17,7 @@ from autoarray.operators.inversion import inversions as inv
 from src.grid.grid import Grid3D
 from src.mask.mask import Mask3D
 #from src.region.region import region
-from src.dataset.dataset import Dataset, MaskedDataset, CubeDataset
+from src.dataset.dataset import Dataset, MaskedDataset
 from src.model import profiles, mass_profiles
 from src.fit import (
     fit
@@ -29,6 +29,7 @@ from src.phase import (
 import numpy as np
 import matplotlib.pyplot as plt
 
+from scipy.interpolate import griddata
 from astropy.io import fits
 
 sys.path.append(
@@ -48,6 +49,14 @@ source_redshift = 2.0
 
 n_pixels = 100
 pixel_scale = 0.05
+
+
+def reshape_array(array):
+
+    return array.reshape(
+        -1,
+        array.shape[-1]
+    )
 
 
 class Image:
@@ -168,24 +177,24 @@ if __name__ == "__main__":
         )
         transformers.append(transformer)
 
-    # xy_mask = Mask3D.unmasked(
-    #     shape_3d=grid_3d.shape_3d,
-    #     pixel_scales=grid_3d.pixel_scales,
-    #     sub_size=grid_3d.sub_size,
-    # )
-    xy_mask = Mask3D.manual(
-        mask_2d=al.Mask.circular(
-            shape_2d=grid_3d.shape_2d,
-            pixel_scales=grid_3d.pixel_scales,
-            sub_size=grid_3d.sub_size,
-            radius=2.5,
-            centre=(0.0, 0.0)
-        ),
-        z_mask=np.full(
-            shape=grid_3d.shape_3d[0],
-            fill_value=False
-        ),
+    xy_mask = Mask3D.unmasked(
+        shape_3d=grid_3d.shape_3d,
+        pixel_scales=grid_3d.pixel_scales,
+        sub_size=grid_3d.sub_size,
     )
+    # xy_mask = Mask3D.manual(
+    #     mask_2d=al.Mask.circular(
+    #         shape_2d=grid_3d.shape_2d,
+    #         pixel_scales=grid_3d.pixel_scales,
+    #         sub_size=grid_3d.sub_size,
+    #         radius=2.5,
+    #         centre=(0.0, 0.0)
+    #     ),
+    #     z_mask=np.full(
+    #         shape=grid_3d.shape_3d[0],
+    #         fill_value=False
+    #     ),
+    # )
     #exit()
 
     lens_mass_profile = mass_profiles.EllipticalPowerLaw(
@@ -263,7 +272,7 @@ if __name__ == "__main__":
 
 
     noise_map = np.random.normal(
-        loc=0.0, scale=5.0 * 10**-1.0, size=visibilities.shape
+        loc=0.0, scale=2.0 * 10**-1.0, size=visibilities.shape
     )
     dataset = Dataset(
         uv_wavelengths=uv_wavelengths,
@@ -281,7 +290,7 @@ if __name__ == "__main__":
     #         invert=True
     #     ),
     #     ncols=8,
-    #     cube_contours=cube,
+    #     cube_contours=lensed_cube,
     #
     # )
     # exit()
@@ -301,55 +310,168 @@ if __name__ == "__main__":
 
 
 
-    # pixelization_shape_0 = 20
-    # pixelization_shape_1 = 20
-    # regularization_coefficient = 10.0
-    #
-    # source_galaxy = al.Galaxy(
-    #     redshift=source_redshift,
-    #     pixelization=al.pix.VoronoiMagnification(
-    #         shape=(pixelization_shape_0, pixelization_shape_1)
-    #     ),
-    #     regularization=al.reg.Constant(
-    #         coefficient=regularization_coefficient
-    #     ),
-    # )
-    #
-    # tracer_with_inversion = al.Tracer.from_galaxies(
-    #     galaxies=[
-    #         al.Galaxy(
-    #             redshift=lens_redshift,
-    #             mass=lens_mass_profile,
-    #         ),
-    #         source_galaxy
-    #     ]
-    # )
-    #
-    # mappers_of_planes = tracer_with_inversion.mappers_of_planes_from_grid(
-    #     grid=masked_dataset.grid_3d.grid_2d,
-    #     inversion_uses_border=False,
-    #     preload_sparse_grids_of_planes=None
-    # )
-    # mapper = mappers_of_planes[-1]
-    #
-    # n = 16
-    # inversion = inv.InversionInterferometer.from_data_mapper_and_regularization(
-    #     visibilities=visibilities[n],
-    #     noise_map=noise_map[n],
-    #     transformer=transformers[n],
-    #     mapper=mapper,
-    #     regularization=source_galaxy.regularization
-    # )
-    #
+    pixelization_shape_0 = 20
+    pixelization_shape_1 = 20
+    regularization_coefficient = 10.0
+
+    source_galaxy = al.Galaxy(
+        redshift=source_redshift,
+        pixelization=al.pix.VoronoiMagnification(
+            shape=(pixelization_shape_0, pixelization_shape_1)
+        ),
+        regularization=al.reg.Constant(
+            coefficient=regularization_coefficient
+        ),
+    )
+
+    tracer_with_inversion = al.Tracer.from_galaxies(
+        galaxies=[
+            al.Galaxy(
+                redshift=lens_redshift,
+                mass=lens_mass_profile,
+            ),
+            source_galaxy
+        ]
+    )
+
+    mappers_of_planes = tracer_with_inversion.mappers_of_planes_from_grid(
+        grid=masked_dataset.grid_3d.grid_2d,
+        inversion_uses_border=False,
+        preload_sparse_grids_of_planes=None
+    )
+    mapper = mappers_of_planes[-1]
+
+    n = 16
+
+
+    prior_values = griddata(
+        points=masked_dataset.grid_3d.grid_2d,
+        values=np.ndarray.flatten(cube[n]),
+        xi=mapper.pixelization_grid,
+        method="linear",
+    )
+    #print(prior_values)
+    # plt.figure()
+    # plt.plot(mapper.pixelization_grid[:, 0], mapper.pixelization_grid[:, 1], linestyle="None", marker="o")
+    # plt.show()
+    # exit()
+
     # plt.figure()
     # autolens_plot_utils.draw_voronoi_pixels(
     #     mapper=mapper,
-    #     values=inversion.reconstruction
+    #     values=prior_values,
     # )
-    # plt.xlim((-0.5, 0.5))
-    # plt.ylim((-0.5, 0.5))
+    # plt.show()
+
+    # plt.figure()
+    # plt.imshow(cube[n])
+    # plt.show()
+    #exit()
+
+    inversion = inv.InversionInterferometer.from_data_mapper_and_regularization(
+        visibilities=dataset.visibilities[n],
+        noise_map=dataset.noise_map[n],
+        transformer=transformers[n],
+        mapper=mapper,
+        regularization=source_galaxy.regularization,
+        prior_values=None
+    )
+
+    # #print(inversion.reconstruction)
+    # #print("prior values:", prior_values)
+    # plt.figure()
+    # autolens_plot_utils.draw_voronoi_pixels(
+    #     mapper=inversion.mapper,
+    #     values=inversion.reconstruction - prior_values
+    # )
     # plt.show()
     # exit()
+
+    inversion_with_prior_values = inv.InversionInterferometer.from_data_mapper_and_regularization(
+        visibilities=dataset.visibilities[n],
+        noise_map=dataset.noise_map[n],
+        transformer=transformers[n],
+        mapper=mapper,
+        regularization=source_galaxy.regularization,
+        prior_values=prior_values
+    )
+
+    print(
+        np.subtract(inversion.reconstruction, inversion_with_prior_values.reconstruction)
+    )
+    #exit()
+
+    nrows = 1
+    ncols = 5
+    plt.figure()
+
+    plt.subplot(
+        nrows,
+        ncols,
+        1
+    )
+    autolens_plot_utils.draw_voronoi_pixels(
+        mapper=inversion.mapper,
+        values=inversion.reconstruction
+    )
+    plt.xlim((-1.0, 1.0))
+    plt.ylim((-1.0, 1.0))
+    plt.xticks([])
+    plt.yticks([])
+
+    plt.subplot(
+        nrows,
+        ncols,
+        2
+    )
+    autolens_plot_utils.draw_voronoi_pixels(
+        mapper=inversion_with_prior_values.mapper,
+        values=inversion_with_prior_values.reconstruction
+    )
+    plt.xlim((-1.0, 1.0))
+    plt.ylim((-1.0, 1.0))
+    plt.xticks([])
+    plt.yticks([])
+
+    plt.subplot(
+        nrows,
+        ncols,
+        3
+    )
+    autolens_plot_utils.draw_voronoi_pixels(
+        mapper=inversion.mapper,
+        values=inversion.reconstruction - inversion_with_prior_values.reconstruction
+    )
+    plt.xlim((-1.0, 1.0))
+    plt.ylim((-1.0, 1.0))
+    plt.xticks([])
+    plt.yticks([])
+
+    plt.subplot(
+        nrows,
+        ncols,
+        4
+    )
+    autolens_plot_utils.draw_voronoi_pixels(
+        mapper=mapper,
+        values=prior_values
+    )
+    plt.xlim((-1.0, 1.0))
+    plt.ylim((-1.0, 1.0))
+    plt.xticks([])
+    plt.yticks([])
+
+    plt.subplot(
+        nrows,
+        ncols,
+        5
+    )
+    plt.imshow(cube[n], cmap="jet", aspect="auto")
+    plt.xticks([])
+    plt.yticks([])
+
+    plt.show()
+    exit()
 
     lens = al.GalaxyModel(
         redshift=lens_redshift,

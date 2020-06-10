@@ -1,0 +1,41 @@
+Bayesian Evidence                                                                         2696031.21589024
+Maximum Likelihood                                                                        2696057.43365373
+
+Most Likely Model:
+
+profiles
+    model_1
+        z_centre                                                                          16.000
+        maximum_velocity                                                                  199.953
+        velocity_dispersion                                                               50.015
+
+
+Most probable model (3.0 sigma limits):
+
+profiles
+    model_1
+        z_centre                                                                          16.000 (15.999, 16.000)
+        maximum_velocity                                                                  199.958 (199.871, 200.042)
+        velocity_dispersion                                                               50.023 (49.978, 50.066)
+
+
+Most probable model (1.0 sigma limits):
+
+profiles
+    model_1
+        z_centre                                                                          16.000 (16.000, 16.000)
+        maximum_velocity                                                                  199.958 (199.931, 199.986)
+        velocity_dispersion                                                               50.023 (50.009, 50.038)
+
+instances
+
+profiles
+    model_1
+        centre
+            centre_0                                                                      0.0
+            centre_1                                                                      0.0
+        intensity                                                                         1.0
+        effective_radius                                                                  0.5
+        inclination                                                                       30.0
+        phi                                                                               50.0
+        turnover_radius                                                                   0.05

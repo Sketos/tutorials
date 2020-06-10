@@ -1,0 +1,13 @@
+profiles
+    model_1
+        centre
+            centre_0                                                                      0.0
+            centre_1                                                                      0.0
+        z_centre                                                                          GaussianPrior, mean = 16.0, sigma = 2.0
+        intensity                                                                         1.0
+        effective_radius                                                                  0.5
+        inclination                                                                       30.0
+        phi                                                                               50.0
+        turnover_radius                                                                   0.05
+        maximum_velocity                                                                  UniformPrior, lower_limit = 150.0, upper_limit = 250.0
+        velocity_dispersion                                                               UniformPrior, lower_limit = 40.0, upper_limit = 60.0

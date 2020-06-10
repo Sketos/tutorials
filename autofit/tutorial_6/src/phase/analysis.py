@@ -32,6 +32,15 @@ def is_light_profile(obj):
 def is_mass_profile(obj):
     return isinstance(obj, al.mp.MassProfile)
 
+def cube_from_image(image, shape_3d):
+
+    # NOTE:
+    if image.in_2d.shape != shape_3d[1:]:
+        raise ValueError("...")
+
+    return np.tile(
+        A=image.in_2d, reps=(shape_3d[0], 1, 1)
+    )
 
 class Image:
     def __init__(self, array_2d):
@@ -43,18 +52,31 @@ class Image:
 
 
 class Analysis(af.Analysis):
-    def __init__(self, masked_dataset, transformers, lens_redshift, source_redshift, image_path=None):
+    def __init__(
+        self,
+        masked_dataset,
+        transformers,
+        transformer_continuum,
+        lens_redshift,
+        source_redshift,
+        image_path=None
+    ):
 
         self.masked_dataset = masked_dataset
 
         self.transformers = transformers
+        self.transformer_continuum = transformer_continuum
 
         self.lens_redshift = lens_redshift
         self.source_redshift = source_redshift
 
         self.visualizer = visualizer.Visualizer(
-            masked_dataset=self.masked_dataset, image_path=image_path
+            masked_dataset=self.masked_dataset,
+            transformers=self.transformers,
+            image_path=image_path
         )
+
+        self.n_tot = 0
 
     def fit(self, instance):
 
@@ -63,12 +85,18 @@ class Analysis(af.Analysis):
             instance=instance
         )
         end = time.time()
-        print(
-            "It tool t={} to compute the model".format(end - start)
-        )
+        # print(
+        #     "It tool t={} to compute the model".format(end - start)
+        # )
 
         fit = self.fit_from_model_data(model_data=model_data)
-        print(fit.likelihood)
+        #print(fit.likelihood)
+        #exit()
+
+        self.n_tot += 1
+        print(
+            "n = {}".format(self.n_tot)
+        )
 
         return fit.likelihood
 
@@ -85,12 +113,40 @@ class Analysis(af.Analysis):
             ]
         )
 
+    # NOTE: This is going to be used for the updated method to compute the lensed cube.
+    # def lensed_cube_from_tracer_and_src_profiles(self, src_profiles, tracer):
+    #
+    #     profile_images = []
+    #     for profile in src_profiles:
+    #         if profile.analytic:
+    #             profile_images.append(
+    #                 cube_from_image(
+    #                     image=tracer.profile_image_from_grid(
+    #                         grid=self.masked_dataset.grid_3d.grid_2d
+    #                     ),
+    #                     shape_3d=self.masked_dataset.grid_3d.shape_3d
+    #                 )
+    #             )
+    #         else:
+    #             profile_images.append(
+    #                 autolens_tracer_utils.lensed_cube_from_tracer(
+    #                     tracer=tracer,
+    #                     grid=self.masked_dataset.grid_3d.grid_2d,
+    #                     cube=profile.profile_cube_from_grid(
+    #                         grid=self.masked_dataset.grid_3d.grid_2d,
+    #                         shape_3d=self.masked_dataset.grid_3d.shape_3d,
+    #                         z_step_kms=self.masked_dataset.z_step_kms
+    #                     )
+    #                 )
+    #             )
+    #
+    #     return sum(profile_images)
+
     def model_data_from_instance(self, instance):
 
         galaxies = []
         src_profiles = []
         for profile in instance.profiles:
-
             if isinstance(profile, al.mp.MassProfile):
                 galaxies.append(
                     al.Galaxy(
@@ -98,9 +154,7 @@ class Analysis(af.Analysis):
                         mass=profile,
                     )
                 )
-
             else:
-
                 src_profiles.append(profile)
 
         galaxies.append(
@@ -121,7 +175,22 @@ class Analysis(af.Analysis):
                 profiles=src_profiles
             )
         )
-        # plot_utils.plot_cube(cube=lensed_cube, ncols=8)
+        # plot_utils.plot_cube(
+        #     cube=lensed_cube,
+        #     ncols=8
+        # )
+        # exit()
+
+        # NOTE: This is going to be used for the updated method to compute the lensed cube.
+        # lensed_cube = self.lensed_cube_from_tracer_and_src_profiles(
+        #     src_profiles=src_profiles,
+        #     tracer=tracer
+        # )
+        # plot_utils.plot_cube(
+        #     cube=lensed_cube,
+        #     ncols=8
+        # )
+        # exit()
 
         model_data = np.zeros(
             shape=self.masked_dataset.data.shape
@@ -143,6 +212,7 @@ class Analysis(af.Analysis):
         )
 
     def visualize(self, instance, during_analysis):
+        # NOTE: Does the visualizer calling the same functions as "fit" does?
 
         model_data = self.model_data_from_instance(
             instance=instance

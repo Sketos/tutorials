@@ -3,14 +3,26 @@ import sys
 
 autolens_version = "0.45.0"
 
+config_path = "./config_{}".format(
+    autolens_version
+)
+if os.environ["HOME"].startswith("/cosma"):
+    cosma_server = "7"
+    output_path = "{}/tutorials/autofit/tutorial_8/output".format(
+        os.environ["COSMA{}_DATA_host".format(cosma_server)]
+    )
+else:
+    output_path="./output"
+
 import autofit as af
 af.conf.instance = af.conf.Config(
-    config_path="./config_{}".format(
-        autolens_version
-    ),
-    output_path="./output"
+    config_path=config_path,
+    output_path=output_path
 )
 import autolens as al
+import autoarray as aa
+if not (al.__version__ == autolens_version):
+    raise ValueError("...")
 
 from autoarray.operators.inversion import inversions as inv
 
@@ -34,7 +46,7 @@ from astropy.io import fits
 sys.path.append(
     "{}/utils".format(os.environ["GitHub"])
 )
-import variable_utils as variable_utils
+#import variable_utils as variable_utils
 import spectral_utils as spectral_utils
 import plot_utils as plot_utils
 
@@ -148,14 +160,6 @@ if __name__ == "__main__":
         n_channels=n_channels
     )
 
-    transformers = []
-    for i in range(uv_wavelengths.shape[0]):
-        transformer = transformer_class(
-            uv_wavelengths=uv_wavelengths[i],
-            grid=grid_3d.grid_2d.in_radians
-        )
-        transformers.append(transformer)
-
     # xy_mask = Mask3D.unmasked(
     #     shape_3d=grid_3d.shape_3d,
     #     pixel_scales=grid_3d.pixel_scales,
@@ -175,6 +179,16 @@ if __name__ == "__main__":
         ),
     )
     #exit()
+
+    transformers = []
+    for i in range(uv_wavelengths.shape[0]):
+        transformer = transformer_class(
+            uv_wavelengths=uv_wavelengths[i],
+            grid=aa.structures.grids.MaskedGrid.from_mask(
+                mask=xy_mask.mask_2d
+            ).in_radians
+        )
+        transformers.append(transformer)
 
     lens_mass_profile = mass_profiles.EllipticalPowerLaw(
         centre=(0.0, 0.0),
@@ -314,8 +328,7 @@ if __name__ == "__main__":
     # )
     # exit()
 
-    # print(masked_dataset.uv_mask[masked_dataset.region].shape)
-    # exit()
+
 
     # pixelization_shape_0 = 20
     # pixelization_shape_1 = 20
@@ -342,7 +355,9 @@ if __name__ == "__main__":
     # )
     #
     # mappers_of_planes = tracer_with_inversion.mappers_of_planes_from_grid(
-    #     grid=masked_dataset.grid_3d.grid_2d,
+    #     grid=aa.structures.grids.MaskedGrid.from_mask(
+    #         mask=xy_mask.mask_2d
+    #     ),
     #     inversion_uses_border=False,
     #     preload_sparse_grids_of_planes=None
     # )
@@ -362,14 +377,19 @@ if __name__ == "__main__":
     #     mapper=mapper,
     #     values=inversion.reconstruction
     # )
-    # plt.xlim((-0.5, 0.5))
-    # plt.ylim((-0.5, 0.5))
+    # plt.xlim((-1.5, 1.5))
+    # plt.ylim((-1.5, 1.5))
     # plt.show()
     # exit()
+
 
     lens = al.GalaxyModel(
         redshift=lens_redshift,
         mass=al.mp.EllipticalIsothermal,
+    )
+    lens.mass.centre_0 = af.GaussianPrior(
+        mean=0.0,
+        sigma=0.01
     )
 
     source_1 = al.GalaxyModel(
@@ -397,9 +417,7 @@ if __name__ == "__main__":
     source_2.pixelization.shape = (15, 15)
     source_2.regularization.coefficient = 100.0
 
-
-
-    lens.mass.centre_0 = 0.0
+    #lens.mass.centre_0 = 0.0
     lens.mass.centre_1 = 0.0
     lens.mass.axis_ratio = 0.75
     lens.mass.phi = 45.0
@@ -409,6 +427,7 @@ if __name__ == "__main__":
 
     phase_name = "phase_tutorial_8"
 
+    """
     data_directory = "./data/{}".format(phase_name)
     if not os.path.isdir(data_directory):
         os.system(
@@ -428,8 +447,10 @@ if __name__ == "__main__":
     os.system(
         "rm -r ./output/{}*".format(phase_name)
     )
+    """
     phase = ph.Phase(
         phase_name=phase_name,
+        phase_folders=["test"],
         galaxies=dict(
             lens=lens,
             source_1=source_1,
@@ -440,7 +461,7 @@ if __name__ == "__main__":
     )
 
     phase.optimizer.constant_efficiency = True
-    phase.optimizer.n_live_points = 100
+    phase.optimizer.n_live_points = 5
     phase.optimizer.sampling_efficiency = 0.5
     phase.optimizer.evidence_tolerance = 100.0
 

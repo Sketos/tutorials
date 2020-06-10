@@ -1,0 +1,121 @@
+{
+    "model.profiles.Kinematical": {
+        "centre": {
+            "type": "Uniform",
+            "lower_limit": 0.0,
+            "upper_limit": 1.0,
+            "width_modifier": {
+                "type": "Absolute",
+                "value": 0.2
+            },
+            "gaussian_limits": {
+                "lower": 0.0,
+                "upper": 1.0
+            }
+        },
+        "z_centre": {
+            "type": "Uniform",
+            "lower_limit": 0.0,
+            "upper_limit": 1.0,
+            "width_modifier": {
+                "type": "Absolute",
+                "value": 0.2
+            },
+            "gaussian_limits": {
+                "lower": 0.0,
+                "upper": 1.0
+            }
+        },
+        "intensity": {
+            "type": "Uniform",
+            "lower_limit": 0.0,
+            "upper_limit": 1.0,
+            "width_modifier": {
+                "type": "Absolute",
+                "value": 0.2
+            },
+            "gaussian_limits": {
+                "lower": 0.0,
+                "upper": 1.0
+            }
+        },
+        "effective_radius": {
+            "type": "Uniform",
+            "lower_limit": 0.0,
+            "upper_limit": 1.0,
+            "width_modifier": {
+                "type": "Absolute",
+                "value": 0.2
+            },
+            "gaussian_limits": {
+                "lower": 0.0,
+                "upper": 1.0
+            }
+        },
+        "inclination": {
+            "type": "Uniform",
+            "lower_limit": 0.0,
+            "upper_limit": 1.0,
+            "width_modifier": {
+                "type": "Absolute",
+                "value": 0.2
+            },
+            "gaussian_limits": {
+                "lower": 0.0,
+                "upper": 1.0
+            }
+        },
+        "phi": {
+            "type": "Uniform",
+            "lower_limit": 0.0,
+            "upper_limit": 1.0,
+            "width_modifier": {
+                "type": "Absolute",
+                "value": 0.2
+            },
+            "gaussian_limits": {
+                "lower": 0.0,
+                "upper": 1.0
+            }
+        },
+        "turnover_radius": {
+            "type": "Uniform",
+            "lower_limit": 0.0,
+            "upper_limit": 1.0,
+            "width_modifier": {
+                "type": "Absolute",
+                "value": 0.2
+            },
+            "gaussian_limits": {
+                "lower": 0.0,
+                "upper": 1.0
+            }
+        },
+        "maximum_velocity": {
+            "type": "Uniform",
+            "lower_limit": 0.0,
+            "upper_limit": 1.0,
+            "width_modifier": {
+                "type": "Absolute",
+                "value": 0.2
+            },
+            "gaussian_limits": {
+                "lower": 0.0,
+                "upper": 1.0
+            }
+        },
+        "velocity_dispersion": {
+            "type": "Uniform",
+            "lower_limit": 0.0,
+            "upper_limit": 1.0,
+            "width_modifier": {
+                "type": "Absolute",
+                "value": 0.2
+            },
+            "gaussian_limits": {
+                "lower": 0.0,
+                "upper": 1.0
+            }
+        }
+    }
+}

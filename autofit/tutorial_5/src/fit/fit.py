@@ -7,7 +7,13 @@ class DatasetFit:
     def __init__(self, masked_dataset, model_data):
 
         self.masked_dataset = masked_dataset
-        self.model_data = model_data
+
+        if not (self.masked_dataset.data.shape == model_data.shape):
+            raise ValueError(
+                "The shape of the data and model_data arrays are not equal"
+            )
+        else:
+            self.model_data = model_data
 
     @property
     def mask(self):

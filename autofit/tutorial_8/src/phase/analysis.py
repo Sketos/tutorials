@@ -1,6 +1,8 @@
 import autofit as af
 import autolens as al
 
+from autoarray.exc import InversionException
+from autofit.exc import FitException
 from autoarray.util import inversion_util
 from autoarray.operators.inversion import inversions as inv
 
@@ -13,7 +15,7 @@ import matplotlib.pyplot as plt
 from scipy import linalg
 
 sys.path.append(
-    "{}/tutorials/autofit/tutorial_7".format(
+    "{}/tutorials/autofit/tutorial_8".format(
         os.environ["GitHub"]
     )
 )
@@ -75,8 +77,11 @@ class Analysis(af.Analysis):
         self.transformer_continuum = transformer_continuum
 
         self.visualizer = visualizer.Visualizer(
-            masked_dataset=self.masked_dataset, image_path=image_path
+            masked_dataset=self.masked_dataset,
+            image_path=image_path
         )
+
+        self.n_tot = 0
 
     def mapper_from_tracer(self, tracer):
 
@@ -136,7 +141,7 @@ class Analysis(af.Analysis):
         for i, transformer in enumerate(self.transformers):
 
             if self.masked_dataset.region[i]:
-                print(i, )
+                #print(i, )
 
                 transformed_mapping_matrices = transformer.transformed_mapping_matrices_from_mapping_matrix(
                     mapping_matrix=mappers[0].mapping_matrix
@@ -191,42 +196,50 @@ class Analysis(af.Analysis):
         # )
         # exit()
 
-        fit_continuum = self.fit_from_masked_dataset_model_data_and_inversion(
-            masked_dataset=self.region_masked_datasets[0],
-            model_data=inversion_continuum.mapped_reconstructed_visibilities,
-            inversion=inversion_continuum
-        )
-
-        fits = []
-        for i, inversion in enumerate(inversions):
-
-            # NOTE: ugly ...
-            fits.append(
-                self.fit_from_masked_dataset_model_data_and_inversion(
-                    masked_dataset=MaskedDatasetLite(
-                        visibilities=self.region_masked_datasets[1].visibilities[i],
-                        noise_map=self.region_masked_datasets[1].noise_map[i],
-                        noise_map_real_and_imag_averaged=self.region_masked_datasets[1].noise_map_real_and_imag_averaged[i],
-                        uv_mask=self.region_masked_datasets[1].uv_mask[i],
-                        uv_mask_real_and_imag_averaged=self.region_masked_datasets[1].uv_mask_real_and_imag_averaged[i]
-                    ),
-                    model_data=inversion.mapped_reconstructed_visibilities,
-                    inversion=inversion
-                )
+        try:
+            fit_continuum = self.fit_from_masked_dataset_model_data_and_inversion(
+                masked_dataset=self.region_masked_datasets[0],
+                model_data=inversion_continuum.mapped_reconstructed_visibilities,
+                inversion=inversion_continuum
             )
 
-        figure_of_merit_continuum = fit_continuum.figure_of_merit
-        #print(figure_of_merit_continuum)
+            fits = []
+            for i, inversion in enumerate(inversions):
 
-        figure_of_merit_line = sum(
-            [fit.figure_of_merit for fit in fits]
-        )
-        #print(figure_of_merit_line)
+                # NOTE: ugly ...
+                fits.append(
+                    self.fit_from_masked_dataset_model_data_and_inversion(
+                        masked_dataset=MaskedDatasetLite(
+                            visibilities=self.region_masked_datasets[1].visibilities[i],
+                            noise_map=self.region_masked_datasets[1].noise_map[i],
+                            noise_map_real_and_imag_averaged=self.region_masked_datasets[1].noise_map_real_and_imag_averaged[i],
+                            uv_mask=self.region_masked_datasets[1].uv_mask[i],
+                            uv_mask_real_and_imag_averaged=self.region_masked_datasets[1].uv_mask_real_and_imag_averaged[i]
+                        ),
+                        model_data=inversion.mapped_reconstructed_visibilities,
+                        inversion=inversion
+                    )
+                )
 
-        figure_of_merit = figure_of_merit_continuum + figure_of_merit_line
-        print(figure_of_merit)
+            figure_of_merit_continuum = fit_continuum.figure_of_merit
+            #print(figure_of_merit_continuum)
 
-        return figure_of_merit
+            figure_of_merit_line = sum(
+                [fit.figure_of_merit for fit in fits]
+            )
+            #print(figure_of_merit_line)
+
+            figure_of_merit = figure_of_merit_continuum + figure_of_merit_line
+            #print(figure_of_merit)
+
+            self.n_tot += 1
+            print(
+                "n = {}".format(self.n_tot)
+            )
+
+            return figure_of_merit
+        except InversionException as e:
+            raise FitException from e
 
 
     def tracers_from_instance(self, instance):
@@ -253,7 +266,7 @@ class Analysis(af.Analysis):
                 # emission lines in the ALMA cube. This assumes that self.regions is now
                 # a list of lists. (FEATURE; not implemented yet)
                 raise ValueError(
-                    "We only need to source galaxies, one for the continuum and one for the line emission"
+                    "We only need 2 source galaxies, one for the continuum and one for the line emission"
                 )
 
         tracers = []
@@ -286,60 +299,3 @@ class Analysis(af.Analysis):
             fit=fit,
             during_analysis=during_analysis
         )
-
-
-
-
-"""
-plt.figure(
-    figsize=(18, 10)
-)
-nrows = 4
-ncols = 8
-xlim_min = -0.5
-xlim_max = 0.5
-ylim_min = -0.5
-ylim_max = 0.5
-xticks = np.linspace(xlim_min, xlim_max, 5)
-yticks = np.linspace(ylim_min, ylim_max, 5)
-i = 0
-j = 0
-for n in range(len(inversions)):
-    print("n = ", n)
-
-    plt.subplot(
-        nrows,
-        ncols,
-        n+1
-    )
-
-    # autolens_plot_utils.draw_voronoi_pixels(
-    #     mapper=mapper,
-    #     values=reconstructions[n]
-    # )
-    autolens_plot_utils.draw_voronoi_pixels(
-        mapper=inversions[n].mapper,
-        values=inversions[n].reconstruction
-    )
-
-    plt.xlim((xlim_min, xlim_max))
-    plt.ylim((ylim_min, ylim_max))
-
-    if i == nrows - 1:
-        plt.xticks(xticks[1:-1])
-    else:
-        plt.xticks([])
-    if j == 0:
-        plt.yticks(yticks[1:-1])
-    else:
-        plt.yticks([])
-
-    j += 1
-    if j == ncols:
-        j = 0
-        i += 1
-
-plt.subplots_adjust(wspace=0.0, hspace=0.0, left=0.05, right=0.95, bottom=0.05, top=0.95)
-plt.show()
-exit()
-"""

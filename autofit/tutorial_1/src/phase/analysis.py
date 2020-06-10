@@ -32,12 +32,10 @@ class Analysis(af.Analysis):
 
         fit = self.fit_from_model_data(model_data=model_data)
         print("likelihood = ", fit.likelihood)
+
         return fit.likelihood
 
     def model_data_from_instance(self, instance):
-
-        for profile in instance.profiles:
-            print(profile.effective_radius)
 
         return sum(
             [

@@ -1,0 +1,30 @@
+profiles
+    lens
+        centre
+            centre_0                                                                      0.0
+            centre_1                                                                      0.0
+        axis_ratio                                                                        0.75
+        phi                                                                               45.0
+        einstein_radius                                                                   1.0
+        slope                                                                             2.0
+    src_model_1
+        centre
+            centre_0                                                                      0.0
+            centre_1                                                                      0.0
+        axis_ratio                                                                        0.75
+        phi                                                                               45.0
+        intensity                                                                         5e-05
+        effective_radius                                                                  0.5
+        sersic_index                                                                      1.0
+    src_model_2
+        centre
+            centre_0                                                                      0.0
+            centre_1                                                                      0.0
+        z_centre                                                                          16.0
+        intensity                                                                         5.0
+        effective_radius                                                                  0.5
+        inclination                                                                       30.0
+        phi                                                                               50.0
+        turnover_radius                                                                   0.05
+        maximum_velocity                                                                  200.0
+        velocity_dispersion                                                               50.0

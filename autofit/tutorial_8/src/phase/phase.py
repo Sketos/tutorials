@@ -5,7 +5,7 @@ import autofit as af
 import autolens as al
 
 sys.path.append(
-    "{}/tutorials/autofit/tutorial_7".format(
+    "{}/tutorials/autofit/tutorial_8".format(
         os.environ["GitHub"]
     )
 )
@@ -20,10 +20,10 @@ from src.phase.analysis import (
     Analysis,
 )
 
-sys.path.append(
-    "{}/utils".format(os.environ["GitHub"])
-)
-import variable_utils as variable_utils
+# sys.path.append(
+#     "{}/utils".format(os.environ["GitHub"])
+# )
+# import variable_utils as variable_utils
 
 
 def reshape_array(array):
@@ -33,30 +33,30 @@ def reshape_array(array):
         array.shape[-1]
     )
 
-
-class RegionMaskedDatasetsHolder:
-    def __init__(self, region_masked_datasets):
-
-        if not isinstance(region_masked_datasets, list):
-            raise ValueError(
-                "\"{}\" must be a list".format(
-                    variable_utils.variable_name(
-                        region_masked_datasets,
-                        globals()
-                    )[0]
-                )
-            )
-        else:
-            self.region_masked_datasets = region_masked_datasets
-
-        self.idx = [region_masked_dataset.continuum
-            for region_masked_dataset
-            in self.region_masked_datasets
-        ]
-
-    @property
-    def masked_dataset_continuum(self):
-        pass
+# # NOTE: EXPERIMENTAL
+# class RegionMaskedDatasetsHolder:
+#     def __init__(self, region_masked_datasets):
+#
+#         if not isinstance(region_masked_datasets, list):
+#             raise ValueError(
+#                 "\"{}\" must be a list".format(
+#                     variable_utils.variable_name(
+#                         region_masked_datasets,
+#                         globals()
+#                     )[0]
+#                 )
+#             )
+#         else:
+#             self.region_masked_datasets = region_masked_datasets
+#
+#         self.idx = [region_masked_dataset.continuum
+#             for region_masked_dataset
+#             in self.region_masked_datasets
+#         ]
+#
+#     @property
+#     def masked_dataset_continuum(self):
+#         pass
 
 
 
@@ -71,6 +71,7 @@ class Phase(af.AbstractPhase):
     def __init__(
         self,
         paths,
+        *,
         galaxies,
         region,
         non_linear_class=af.MultiNest,
@@ -100,19 +101,12 @@ class Phase(af.AbstractPhase):
     def make_analysis(self, dataset, xy_mask):
 
         # NOTE: Multiple lines can be present in a cube, in which
-        # casa region will be a list (renamed to regions)
+        # case region will be a list (renamed to regions)
         masked_dataset = MaskedDataset(
             dataset=dataset,
             xy_mask=xy_mask,
             region=self.region
         )
-
-        # print(masked_dataset.uv_wavelengths_outside_region.shape)
-        # print(masked_dataset.visibilities_outside_region.shape)
-        # print(masked_dataset.noise_map_outside_region.shape)
-        # print(masked_dataset.uv_wavelengths_inside_region.shape)
-        # print(masked_dataset.visibilities_inside_region.shape)
-        # print(masked_dataset.noise_map_inside_region.shape)
 
         masked_dataset_continuum = RegionMaskedDataset(
             dataset=masked_dataset.dataset_outside_region,
@@ -125,16 +119,6 @@ class Phase(af.AbstractPhase):
             uv_mask=masked_dataset.uv_mask_inside_region,
             continuum=False
         )
-
-        # print(masked_dataset_continuum.visibilities.shape)
-        # print(masked_dataset_continuum.uv_wavelengths.shape)
-        # print(masked_dataset_continuum.noise_map.shape)
-        # print(masked_dataset_continuum.uv_mask.shape)
-        # print(masked_dataset_line.visibilities.shape)
-        # print(masked_dataset_line.uv_wavelengths.shape)
-        # print(masked_dataset_line.noise_map.shape)
-        # print(masked_dataset_line.uv_mask.shape)
-        # exit()
 
         transformers = []
         for i in range(masked_dataset.uv_wavelengths.shape[0]):

@@ -1,0 +1,89 @@
+Bayesian Evidence                                                                         -43303.11670682
+Maximum Likelihood                                                                        -43237.11412833
+
+Most Likely Model:
+
+profiles
+    lens
+        axis_ratio                                                                        0.749
+        phi                                                                               45.050
+        centre
+            centre_0                                                                      -0.001
+            centre_1                                                                      -0.001
+        einstein_radius                                                                   1.002
+    src_model_2
+        maximum_velocity                                                                  200.416
+        velocity_dispersion                                                               50.003
+    subhalo
+        mass_at_200                                                                       120571294.408
+        centre
+            centre_0                                                                      -1.015
+            centre_1                                                                      -1.948
+
+
+Most probable model (3.0 sigma limits):
+
+profiles
+    lens
+        axis_ratio                                                                        0.749 (0.749, 0.750)
+        phi                                                                               45.054 (45.020, 45.090)
+        centre
+            centre_0                                                                      -0.001 (-0.001, -0.001)
+            centre_1                                                                      -0.001 (-0.001, -0.001)
+        einstein_radius                                                                   1.002 (1.002, 1.002)
+    src_model_2
+        maximum_velocity                                                                  200.433 (200.329, 200.543)
+        velocity_dispersion                                                               49.978 (49.909, 50.051)
+    subhalo
+        mass_at_200                                                                       109680759.562 (67125182.752, 154920299.373)
+        centre
+            centre_0                                                                      -1.033 (-1.256, -0.961)
+            centre_1                                                                      -1.941 (-2.056, -1.762)
+
+
+Most probable model (1.0 sigma limits):
+
+profiles
+    lens
+        axis_ratio                                                                        0.749 (0.749, 0.749)
+        phi                                                                               45.054 (45.042, 45.066)
+        centre
+            centre_0                                                                      -0.001 (-0.001, -0.001)
+            centre_1                                                                      -0.001 (-0.001, -0.001)
+        einstein_radius                                                                   1.002 (1.002, 1.002)
+    src_model_2
+        maximum_velocity                                                                  200.433 (200.400, 200.465)
+        velocity_dispersion                                                               49.978 (49.952, 50.002)
+    subhalo
+        mass_at_200                                                                       109680759.562 (94843340.904, 124236478.013)
+        centre
+            centre_0                                                                      -1.033 (-1.048, -0.994)
+            centre_1                                                                      -1.941 (-1.994, -1.901)
+
+instances
+
+profiles
+    lens
+        slope                                                                             2.0
+    subhalo
+        redshift_object                                                                   0.5
+        redshift_source                                                                   2.0
+    src_model_1
+        centre
+            centre_0                                                                      0.0
+            centre_1                                                                      0.0
+        axis_ratio                                                                        0.75
+        phi                                                                               45.0
+        intensity                                                                         5e-05
+        effective_radius                                                                  0.5
+        sersic_index                                                                      1.0
+    src_model_2
+        centre
+            centre_0                                                                      0.0
+            centre_1                                                                      0.0
+        z_centre                                                                          16.0
+        intensity                                                                         5.0
+        effective_radius                                                                  0.5
+        inclination                                                                       30.0
+        phi                                                                               50.0
+        turnover_radius                                                                   0.05

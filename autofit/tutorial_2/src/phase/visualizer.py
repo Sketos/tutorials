@@ -58,12 +58,14 @@ class Visualizer(AbstractVisualizer):
         #     output_path=self.image_path,
         #     output_format="png",
         # )
-        # fit_plots.residual_map(
-        #     fit=fit,
-        #     output_filename="fit_residual_map",
-        #     output_path=self.image_path,
-        #     output_format="png",
-        # )
+
+        fit_plots.residual_map(
+            fit=fit,
+            output_filename="fit_residual_map",
+            output_path=self.image_path,
+            output_format="png",
+        )
+
         # fit_plots.chi_squared_map(
         #     fit=fit,
         #     output_filename="fit_chi_squared_map",

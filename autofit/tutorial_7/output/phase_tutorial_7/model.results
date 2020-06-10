@@ -1,0 +1,34 @@
+Bayesian Evidence                                                                         -6.14379666
+Maximum Likelihood                                                                        0.98307276
+
+Most Likely Model:
+
+galaxies
+    source
+        regularization
+            coefficient                                                                   40155.842
+        pixelization
+            shape
+                shape_0                                                                   5.543
+                shape_1                                                                   49.238
+
+ WARNING: The chains have not converged enough to compute a PDF and model errors. 
+ The model below over estimates errors. 
+
+
+
+instances
+
+galaxies
+    lens
+        redshift                                                                          0.5
+        mass
+            centre
+                centre_0                                                                  0.0
+                centre_1                                                                  0.0
+            axis_ratio                                                                    0.75
+            phi                                                                           45.0
+            einstein_radius                                                               1.0
+            slope                                                                         2.0
+    source
+        redshift                                                                          2.0

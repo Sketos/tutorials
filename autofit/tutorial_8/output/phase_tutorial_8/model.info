@@ -12,12 +12,16 @@ galaxies
     source_1
         redshift                                                                          2.0
         pixelization
-            shape                                                                         (15, 15)
+            shape
+                shape_0                                                                   UniformPrior, lower_limit = 5.0, upper_limit = 50.0
+                shape_1                                                                   UniformPrior, lower_limit = 5.0, upper_limit = 50.0
         regularization
-            coefficient                                                                   10.0
+            coefficient                                                                   LogUniformPrior, lower_limit = 1e-06, upper_limit = 100000.0
     source_2
         redshift                                                                          2.0
         pixelization
-            shape                                                                         (15, 15)
+            shape
+                shape_0                                                                   UniformPrior, lower_limit = 5.0, upper_limit = 50.0
+                shape_1                                                                   UniformPrior, lower_limit = 5.0, upper_limit = 50.0
         regularization
-            coefficient                                                                   100.0
+            coefficient                                                                   LogUniformPrior, lower_limit = 1e-06, upper_limit = 100000.0

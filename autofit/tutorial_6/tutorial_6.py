@@ -1,31 +1,39 @@
 import os
 import sys
+import numpy as np
+import matplotlib.pyplot as plt
 
 autolens_version = "0.45.0"
+#autolens_version = "0.46.2"
+
+config_path = "./config_{}".format(
+    autolens_version
+)
+if os.environ["HOME"].startswith("/cosma"):
+    cosma_server = "7"
+    output_path = "{}/tutorials/autofit/tutorial_6/output".format(
+        os.environ["COSMA{}_DATA_host".format(cosma_server)]
+    )
+else:
+    output_path="./output"
 
 import autofit as af
 af.conf.instance = af.conf.Config(
-    config_path="./config_{}".format(
-        autolens_version
-    ),
-    output_path="./output"
+    config_path=config_path,
+    output_path=output_path
 )
 import autolens as al
+if not (al.__version__ == autolens_version):
+    raise ValueError("...")
 
 from src.grid.grid import Grid3D
 from src.mask.mask import Mask3D
-#from src.region.region import region
+from src.region.region import Region
 from src.dataset.dataset import Dataset, MaskedDataset
-from src.model import profiles, mass_profiles
-from src.fit import (
-    fit
-)
-from src.phase import (
-    phase as ph,
-)
-
-import numpy as np
-import matplotlib.pyplot as plt
+from src.model import profiles, mass_profiles, dark_mass_profiles
+from src.fit import fit
+from src.phase import phase
+from src.plot import fit_plots
 
 sys.path.append(
     "{}/utils".format(os.environ["GitHub"])
@@ -35,6 +43,7 @@ import plot_utils as plot_utils
 
 import interferometry_utils.load_utils as interferometry_load_utils
 
+import autolens_utils.autolens_plot_utils as autolens_plot_utils
 import autolens_utils.autolens_tracer_utils as autolens_tracer_utils
 
 
@@ -77,25 +86,6 @@ def load_uv_wavelengths(filename):
     return uv_wavelengths
 
 
-def dirty_cube_from_visibilities(visibilities, transformers, shape, invert=True):
-
-    if len(transformers) != visibilities.shape[0]:
-        raise ValueError("...")
-
-    dirty_cube = np.zeros(
-        shape=shape
-    )
-    for i in range(visibilities.shape[0]):
-        dirty_cube[i] = transformers[i].image_from_visibilities(
-            visibilities=visibilities[i]
-        )
-
-    if invert:
-        return dirty_cube[:, ::-1, :]
-    return dirty_cube
-
-
-
 uv_wavelengths = load_uv_wavelengths(
     filename="{}/uv_wavelengths.fits".format(
         os.path.dirname(
@@ -108,21 +98,23 @@ n_channels = uv_wavelengths.shape[0]
 z_step_kms = 50.0 # NOTE: This does not correspond to the actual value of z_step_kms for this uv_wavelengths dataset
 
 
-def region(n, n_min, n_max, invert=False):
-
-    mask = np.zeros(
-        shape=int(n), dtype=int
-    )
-
-    if n_min > 0 and n_min < n_max and n_max < n:
-        mask[n_min:n_max] = 1
-    else:
-        raise ValueError("...")
-
-    return mask.astype(bool)
+# def region(n, n_min, n_max, invert=False):
+#
+#     mask = np.zeros(
+#         shape=int(n), dtype=int
+#     )
+#
+#     if n_min > 0 and n_min < n_max and n_max < n:
+#         mask[n_min:n_max] = 1
+#     else:
+#         raise ValueError("...")
+#
+#     return mask.astype(bool)
 
 
 if __name__ == "__main__":
+
+    transformer_class = al.TransformerFINUFFT
 
     grid_3d = Grid3D(
         grid_2d=al.Grid.uniform(
@@ -139,27 +131,21 @@ if __name__ == "__main__":
         n_channels=n_channels
     )
 
-    transformers = []
-    for i in range(uv_wavelengths.shape[0]):
-        transformer = al.TransformerFINUFFT(
-            uv_wavelengths=uv_wavelengths[i],
-            grid=grid_3d.grid_2d.in_radians
-        )
-        transformers.append(transformer)
-
-    xy_mask = Mask3D.unmasked(
-        shape_3d=grid_3d.shape_3d,
-        pixel_scales=grid_3d.pixel_scales,
-        sub_size=grid_3d.sub_size,
-    )
-
-    lens_model = mass_profiles.EllipticalPowerLaw(
+    lens_mass_profile = mass_profiles.EllipticalPowerLaw(
         centre=(0.0, 0.0),
         axis_ratio=0.75,
         phi=45.0,
         einstein_radius=1.0,
         slope=2.0
     )
+
+    subhalo_mass_profile = dark_mass_profiles.SphericalNFWMCRLudlow(
+        centre=(-0.75, -0.5),
+        mass_at_200=1e9,
+        redshift_object=lens_redshift,
+        redshift_source=source_redshift
+    )
+    #exit()
 
     model_1 = profiles.EllipticalSersic(
         centre=(0.0, 0.0),
@@ -169,6 +155,48 @@ if __name__ == "__main__":
         effective_radius=0.5,
         sersic_index=1.0,
     )
+
+    # ================= #
+    """
+    # NOTE: THIS SHOULD BE A TEST SOMEWHERE
+    tracer = al.Tracer.from_galaxies(
+        galaxies=[
+            al.Galaxy(
+                redshift=lens_redshift,
+                mass=lens_mass_profile,
+            ),
+            al.Galaxy(
+                redshift=source_redshift,
+                light=model_1
+            )
+        ]
+    )
+
+    lensed_image = tracer.profile_image_from_grid(
+        grid=grid_3d.grid_2d
+    )
+    print(lensed_image.in_2d.shape)
+
+    image = model_1.profile_image_from_grid(
+        grid=grid_3d.grid_2d,
+        grid_radial_minimum=None
+    )
+
+    lens_image_approx = autolens_tracer_utils.lensed_image_from_tracer(
+        tracer=tracer,
+        grid=grid_3d.grid_2d,
+        image=image.in_2d,
+    )
+
+    figure, axes = plt.subplots(nrows=1, ncols=3)
+    axes[0].imshow(lensed_image.in_2d)
+    axes[1].imshow(lens_image_approx)
+    axes[2].imshow(lensed_image.in_2d - lens_image_approx)
+    plt.show()
+    exit()
+    """
+    # ================= #
+
     model_2 = profiles.Kinematical(
         centre=(0.0, 0.0),
         z_centre=16.0,
@@ -198,16 +226,57 @@ if __name__ == "__main__":
     # )
     # exit()
 
-    emission_line_region = region(
+    lensed_cube = autolens_tracer_utils.lensed_cube_from_tracer(
+        tracer=al.Tracer.from_galaxies(
+            galaxies=[
+                al.Galaxy(
+                    redshift=lens_redshift,
+                    mass=lens_mass_profile,
+                ),
+                al.Galaxy(
+                    redshift=lens_redshift,
+                    mass=subhalo_mass_profile,
+                ),
+                al.Galaxy(
+                    redshift=source_redshift,
+                    light=al.lp.LightProfile()
+                )
+            ]
+        ),
+        grid=grid_3d.grid_2d,
+        cube=cube
+    )
+    # plot_utils.plot_cube(
+    #     cube=lensed_cube,
+    #     ncols=8,
+    #     extent=grid_3d.extent,
+    #     points=[
+    #         plot_utils.Point(
+    #             y=subhalo_mass_profile.centre[0],
+    #             x=subhalo_mass_profile.centre[1],
+    #             color="black"
+    #         ),
+    #         plot_utils.Point(
+    #             y=lens_mass_profile.centre[0],
+    #             x=lens_mass_profile.centre[1],
+    #             color="white"
+    #         ),
+    #
+    #     ]
+    # )
+    # exit()
+
+    emission_line_region = Region.from_limits(
         n=n_channels,
         n_min=10,
         n_max=22
     )
 
     # # NOTE: TEST ...
-    # cube_region = cube[emission_line_region]
+    # #cube_region = cube[emission_line_region]
+    # cube[emission_line_region] = 0.0
     # plot_utils.plot_cube(
-    #     cube=cube_region,
+    #     cube=cube,
     #     ncols=8
     # )
     # exit()
@@ -227,28 +296,37 @@ if __name__ == "__main__":
     # plt.show()
     # exit()
 
+
+    transformers = []
+    for i in range(uv_wavelengths.shape[0]):
+        transformer = transformer_class(
+            uv_wavelengths=uv_wavelengths[i],
+            grid=grid_3d.grid_2d.in_radians
+        )
+        transformers.append(transformer)
+
     visibilities = np.zeros(
         shape=uv_wavelengths.shape
     )
     for i in range(visibilities.shape[0]):
         visibilities[i] = transformers[i].visibilities_from_image(
                 image=Image(
-                    array_2d=cube[i]
+                    array_2d=lensed_cube[i]
                 )
             )
     # plot_utils.plot_cube(
-    #     cube=dirty_cube_from_visibilities(
+    #     cube=autolens_plot_utils.dirty_cube_from_visibilities(
     #         visibilities=visibilities,
     #         transformers=transformers,
     #         shape=cube.shape
     #     ),
     #     ncols=8,
-    #     cube_contours=cube,
+    #     cube_contours=lensed_cube,
     # )
     # exit()
 
     noise_map = np.random.normal(
-        loc=0.0, scale=5.0 * 10**-1.0, size=visibilities.shape
+        loc=0.0, scale=1.0 * 10**-1.0, size=visibilities.shape
     )
     dataset = Dataset(
         uv_wavelengths=uv_wavelengths,
@@ -258,18 +336,31 @@ if __name__ == "__main__":
         noise_map=noise_map,
         z_step_kms=z_step_kms
     )
-    # plot_utils.plot_cube(
-    #     cube=dirty_cube_from_visibilities(
-    #         visibilities=dataset.visibilities,
-    #         transformers=transformers,
-    #         shape=cube.shape,
-    #         invert=True
-    #     ),
-    #     ncols=8,
-    #     cube_contours=cube,
-    #
-    # )
-    # exit()
+    plot_utils.plot_cube(
+        cube=autolens_plot_utils.dirty_cube_from_visibilities(
+            visibilities=dataset.visibilities,
+            transformers=transformers,
+            shape=cube.shape,
+            invert=True
+        ),
+        ncols=8,
+        extent=grid_3d.extent,
+        points=[
+            plot_utils.Point(
+                y=subhalo_mass_profile.centre[0],
+                x=subhalo_mass_profile.centre[1],
+                color="black"
+            ),
+            plot_utils.Point(
+                y=lens_mass_profile.centre[0],
+                x=lens_mass_profile.centre[1],
+                color="white"
+            ),
+
+        ],
+        #cube_contours=lensed_cube,
+    )
+    exit()
 
     # NOTE: Plotting visibilities
     # for i in range(dataset.visibilities.shape[0]):
@@ -284,71 +375,217 @@ if __name__ == "__main__":
     #     plt.show()
     # exit()
 
+    xy_mask = Mask3D.unmasked(
+        shape_3d=grid_3d.shape_3d,
+        pixel_scales=grid_3d.pixel_scales,
+        sub_size=grid_3d.sub_size,
+    )
+
     masked_dataset = MaskedDataset(
         dataset=dataset,
         xy_mask=xy_mask
     )
 
+
     # fit_temp = fit.DatasetFit(
     #     masked_dataset=masked_dataset,
     #     model_data=visibilities
     # )
-    # # plot_utils.plot_cube(
-    # #     cube=dirty_cube_from_visibilities(
-    # #         visibilities=fit_temp.residual_map,
-    # #         transformers=transformers,
-    # #         shape=cube.shape
-    # #     ),
-    # #     ncols=8
-    # # )
+    # fit_plots.residual_map(
+    #     fit=fit_temp,
+    #     transformers=transformers
+    # )
+    # # print("chi_squared = ", fit_temp.chi_squared)
+    # # print("noise_normalization = ", fit_temp.noise_normalization)
     # # print("likelihood = ", fit_temp.likelihood)
-    # # exit()
+    # exit()
 
-    lens_model_1 = af.PriorModel(mass_profiles.EllipticalPowerLaw)
-    model_1 = af.PriorModel(profiles.EllipticalSersic)
-    model_1.centre_0 = af.GaussianPrior(
+
+    lens_model = af.PriorModel(mass_profiles.EllipticalPowerLaw)
+    lens_model.centre_0 = af.GaussianPrior(
         mean=0.0,
         sigma=0.25
     )
-    model_1.centre_1 = af.GaussianPrior(
+    lens_model.centre_1 = af.GaussianPrior(
         mean=0.0,
         sigma=0.25
     )
-    model_1.intensity = af.LogUniformPrior(
+    lens_model.einstein_radius = af.UniformPrior(
+        lower_limit=0.85,
+        upper_limit=1.25
+    )
+
+    src_model_1 = af.PriorModel(profiles.EllipticalSersic)
+    src_model_1.centre_0 = af.GaussianPrior(
+        mean=0.0,
+        sigma=0.25
+    )
+    src_model_1.centre_1 = af.GaussianPrior(
+        mean=0.0,
+        sigma=0.25
+    )
+    src_model_1.intensity = af.LogUniformPrior(
         lower_limit=5.0 * 10**-6.0,
         upper_limit=5.0 * 10**-4.0
     )
-    model_2 = af.PriorModel(profiles.Kinematical)
-    model_2.z_centre = af.GaussianPrior(
+
+    src_model_2 = af.PriorModel(profiles.Kinematical)
+    src_model_2.z_centre = af.GaussianPrior(
         mean=16.0,
         sigma=2.0
     )
-    model_2.intensity = af.LogUniformPrior(
+    src_model_2.intensity = af.LogUniformPrior(
         lower_limit=10**-2.0,
         upper_limit=10**+2.0
     )
-
-    phase_name = "phase_tutorial_6"
-    os.system(
-        "rm -r output/{}*".format(phase_name)
+    src_model_2.maximum_velocity = af.UniformPrior(
+        lower_limit=25.0,
+        upper_limit=400.0
     )
-    phase = ph.Phase(
-        phase_name=phase_name,
+    src_model_2.velocity_dispersion = af.UniformPrior(
+        lower_limit=0.0,
+        upper_limit=100.0
+    )
+
+    # NOTE: example 1
+    #lens_model.centre_0 = 0.0
+    #lens_model.centre_1 = 0.0
+    #lens_model.axis_ratio = 0.75
+    #lens_model.phi = 45.0
+    #lens_model.einstein_radius = 1.0
+    lens_model.slope = 2.0
+
+    src_model_1.centre_0 = 0.0
+    src_model_1.centre_1 = 0.0
+    src_model_1.axis_ratio = 0.75
+    src_model_1.phi = 45.0
+    src_model_1.intensity = 0.00005
+    src_model_1.effective_radius = 0.5
+    src_model_1.sersic_index = 1.0
+
+    src_model_2.centre_0 = 0.0
+    src_model_2.centre_1 = 0.0
+    src_model_2.z_centre = 16.0
+    src_model_2.intensity = 5.0
+    src_model_2.effective_radius = 0.5
+    src_model_2.inclination = 30.0
+    src_model_2.phi = 50.0
+    src_model_2.turnover_radius = 0.05
+    #src_model_2.maximum_velocity = 200.0
+    #src_model_2.velocity_dispersion = 50.0
+
+    # exit()
+    phase_folders = ["test"]
+    phase_1_name = "phase_tutorial_6__version_{}".format(autolens_version)
+    # os.system(
+    #     "rm -r output/{}".format(phase_1_name)
+    # )
+    phase_1 = phase.Phase(
+        phase_name=phase_1_name,
+        phase_folders=phase_folders,
         profiles=af.CollectionPriorModel(
-            lens=lens_model_1,
-            src_model_1=model_1,
-            src_model_2=model_2
+            lens=lens_model,
+            src_model_1=src_model_1,
+            src_model_2=src_model_2
         ),
         lens_redshift=lens_redshift,
         source_redshift=source_redshift,
+        regions=[
+            emission_line_region
+        ]
     )
 
-    phase.optimizer.constant_efficiency = True
-    phase.optimizer.n_live_points = 100
-    phase.optimizer.sampling_efficiency = 0.5
-    phase.optimizer.evidence_tolerance = 100.0
+    phase_1.optimizer.constant_efficiency = True
+    phase_1.optimizer.n_live_points = 100
+    phase_1.optimizer.sampling_efficiency = 0.5
+    phase_1.optimizer.evidence_tolerance = 100.0
 
-    phase.run(
+    phase_1.run(
         dataset=dataset,
         xy_mask=xy_mask
     )
+
+    """
+    def GridPhase(
+        redshift_object,
+        redshift_source,
+        centre_0_min,
+        centre_0_max,
+        centre_1_min,
+        centre_1_max,
+        n=5
+    ):
+
+        phase_folders = ["GridPhase"]
+
+        subhalo_model = af.PriorModel(dark_mass_profiles.SphericalNFWMCRLudlow)
+
+        subhalo_model.mass_at_200 = af.LogUniformPrior(
+            lower_limit=1.0e6,
+            upper_limit=1.0e10
+        )
+        subhalo_model.redshift_object = redshift_object
+        subhalo_model.redshift_source = redshift_source
+        # subhalo_model = al.mp.SphericalNFWMCRLudlow(
+        #     centre=(0.0, -1.0),
+        #     mass_at_200=1e9,
+        #     redshift_object=lens_redshift,
+        #     redshift_source=source_redshift
+        # )
+
+        centre_0 = np.linspace(centre_0_min, centre_0_max, n)
+        centre_1 = np.linspace(centre_1_min, centre_1_max, n)
+
+        for centre_0_lower_limit, centre_0_upper_limit in zip(centre_0[:-1], centre_0[1:]):
+            for centre_1_lower_limit, centre_1_upper_limit in zip(centre_1[:-1], centre_1[1:]):
+
+                phase_name = "centre_0_{}_{}_centre_1_{}_{}".format(
+                    centre_0_lower_limit,
+                    centre_0_upper_limit,
+                    centre_1_lower_limit,
+                    centre_1_upper_limit
+                )
+
+                subhalo_model.centre_0 = af.UniformPrior(
+                    lower_limit=centre_0_lower_limit,
+                    upper_limit=centre_0_upper_limit
+                )
+                subhalo_model.centre_1 = af.UniformPrior(
+                    lower_limit=centre_1_lower_limit,
+                    upper_limit=centre_1_upper_limit
+                )
+
+                grid_phase = phase.Phase(
+                    phase_name=phase_name,
+                    phase_folders=phase_folders,
+                    profiles=af.CollectionPriorModel(
+                        lens=lens_model,
+                        subhalo=subhalo_model,
+                        src_model_1=src_model_1,
+                        src_model_2=src_model_2
+                    ),
+                    lens_redshift=lens_redshift,
+                    source_redshift=source_redshift,
+                )
+
+                grid_phase.optimizer.constant_efficiency = True
+                grid_phase.optimizer.n_live_points = 100
+                grid_phase.optimizer.sampling_efficiency = 0.5
+                grid_phase.optimizer.evidence_tolerance = 100.0
+
+                grid_phase.run(
+                    dataset=dataset,
+                    xy_mask=xy_mask
+                )
+
+
+    GridPhase(
+        redshift_object=lens_redshift,
+        redshift_source=source_redshift,
+        centre_0_min=-2.0,
+        centre_0_max=2.0,
+        centre_1_min=-2.0,
+        centre_1_max=2.0,
+        n=5
+    )
+    """

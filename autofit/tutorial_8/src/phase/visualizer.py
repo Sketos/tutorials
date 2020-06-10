@@ -2,7 +2,7 @@ import os
 import sys
 
 sys.path.append(
-    "{}/tutorials/autofit/tutorial_6".format(
+    "{}/tutorials/autofit/tutorial_8".format(
         os.environ["GitHub"]
     )
 )

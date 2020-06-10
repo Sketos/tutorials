@@ -1,0 +1,7 @@
+profiles_model_intensity_value                                        I_{\mathrm{l17}}
+profiles_model_centre_0                                               y_{\mathrm{l17}}
+profiles_model_centre_1                                               x_{\mathrm{l17}}
+profiles_model_axis_ratio                                             q_{\mathrm{l17}}
+profiles_model_phi                                                    \phi_{\mathrm{l17}}
+profiles_model_effective_radius                                       R_{\mathrm{l17}}
+profiles_model_sersic_index                                           n_{\mathrm{l17}}

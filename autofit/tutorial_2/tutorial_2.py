@@ -2,24 +2,25 @@ import os
 import sys
 
 autolens_version = "0.45.0"
+#autolens_version = "0.46.2"
 
 import autofit as af
 af.conf.instance = af.conf.Config(
-    config_path="./config_{}".format(autolens_version),
+    config_path="./../../config_{}".format(
+        autolens_version
+    ),
     output_path="./output"
 )
 import autolens as al
+if not (al.__version__ == autolens_version):
+    raise ValueError("...")
 
 from src.grid.grid import Grid3D
 from src.mask.mask import Mask3D
 from src.dataset.dataset import Dataset, MaskedDataset
 from src.model import profiles
-from src.fit import (
-    fit
-)
-from src.phase import (
-    phase as ph,
-)
+from src.fit import fit
+from src.phase import phase as ph
 
 import numpy as np
 import matplotlib.pyplot as plt
@@ -107,7 +108,7 @@ if __name__ == "__main__":
 
 
     noise_map = np.random.normal(
-        loc=0.0, scale=10**-5.0, size=grid_3d.shape_3d
+        loc=0.0, scale=10**-4.0, size=grid_3d.shape_3d
     )
     dataset = Dataset(
         data=np.add(
@@ -130,45 +131,74 @@ if __name__ == "__main__":
     )
 
 
+    # ================================================ #
+    # NOTE: ...
+    """
+    model_temp = profiles.Kinematical(
+        centre=(0.0, 0.0),
+        z_centre=16.0,
+        intensity=1.0,
+        effective_radius=0.5,
+        inclination=30.0,
+        phi=50.0,
+        turnover_radius=0.05,
+        maximum_velocity=200.0,
+        velocity_dispersion=50.0
+    )
 
-    # residual_map = fit.residual_map_from_data_model_data_and_mask(
-    #     data=masked_dataset.data,
-    #     mask=masked_dataset.mask,
-    #     model_data=cube
+    cube_temp = model_temp.profile_cube_from_grid(
+        grid=grid_3d.grid_2d,
+        shape_3d=grid_3d.shape_3d,
+        z_step_kms=z_step_kms
+    )
+
+    fit_temp = fit.DatasetFit(
+        masked_dataset=masked_dataset,
+        model_data=cube_temp
+    )
+    # plot_utils.plot_cube(
+    #     cube=fit_temp.residual_map,
+    #     ncols=8
     # )
-    # # plot_utils.plot_cube(
-    # #     cube=residual_map,
-    # #     ncols=8
-    # # )
-    # # exit()
-    #
-    # likelihood = fit.likelihood_from_chi_squared_and_noise_normalization(
-    #     chi_squared=fit.chi_squared_from_chi_squared_map_and_mask(
-    #         chi_squared_map=fit.chi_squared_map_from_residual_map_noise_map_and_mask(
-    #             residual_map=residual_map,
-    #             noise_map=masked_dataset.noise_map,
-    #             mask=masked_dataset.mask
-    #         ),
-    #         mask=masked_dataset.mask
-    #     ),
-    #     noise_normalization=fit.noise_normalization_from_noise_map_and_mask(
-    #         noise_map=masked_dataset.noise_map,
-    #         mask=masked_dataset.mask
-    #     )
-    # )
-    # print(likelihood)
     # exit()
 
-    model_1 = profiles.Kinematical
+    print(fit_temp.likelihood)
 
-    # model_1.z_centre = af.GaussianPrior(
-    #     mean=grid_3d.n_channels / 2.0,
-    #     sigma=2.0
-    # )
+    exit()
+    """
+    # ================================================ #
 
-    phase_name = "phase_tutorial_2"
+
+    model_1 = af.PriorModel(profiles.Kinematical)
+
+    model_1.centre_0 = 0.0
+    model_1.centre_1 = 0.0
+    #model_1.z_centre = 16.0
+    model_1.intensity = 1.0
+    model_1.effective_radius = 0.5
+    model_1.inclination = 30.0
+    model_1.phi = 50.0
+    model_1.turnover_radius = 0.05
+    #model_1.maximum_velocity = 200.0
+
+
+    model_1.z_centre = af.GaussianPrior(
+        mean=grid_3d.n_channels / 2.0,
+        sigma=2.0
+    )
+
+    model_1.maximum_velocity = af.UniformPrior(
+        lower_limit=150.0,
+        upper_limit=250.0
+    )
+    model_1.velocity_dispersion = af.UniformPrior(
+        lower_limit=40.0,
+        upper_limit=60.0
+    )
+
+    phase_name = "phase_tutorial_2__version_{}".format(autolens_version)
     os.system(
-        "rm -r output/{}*".format(phase_name)
+        "rm -r output/{}".format(phase_name)
     )
     phase = ph.Phase(
         phase_name=phase_name,

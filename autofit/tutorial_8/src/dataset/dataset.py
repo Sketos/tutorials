@@ -194,7 +194,6 @@ class MaskedDataset:
         )
 
 
-# NOTE: rename this cause this is something else in autolens ...
 class RegionMaskedDataset:
     def __init__(self, dataset, continuum=False, uv_mask=None):
 
