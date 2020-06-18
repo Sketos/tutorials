@@ -1,0 +1,21 @@
+profiles
+    lens
+        centre
+            centre_0                                                                      GaussianPrior, mean = 0.0, sigma = 0.25
+            centre_1                                                                      GaussianPrior, mean = 0.0, sigma = 0.25
+        axis_ratio                                                                        UniformPrior, lower_limit = 0.2, upper_limit = 1.0
+        phi                                                                               UniformPrior, lower_limit = 0.0, upper_limit = 180.0
+        einstein_radius                                                                   UniformPrior, lower_limit = 0.85, upper_limit = 1.25
+        slope                                                                             UniformPrior, lower_limit = 1.5, upper_limit = 2.5
+    src_model
+        centre
+            centre_0                                                                      GaussianPrior, mean = 0.0, sigma = 0.25
+            centre_1                                                                      GaussianPrior, mean = 0.0, sigma = 0.25
+        z_centre                                                                          GaussianPrior, mean = 16.0, sigma = 2.0
+        intensity                                                                         LogUniformPrior, lower_limit = 0.01, upper_limit = 100.0
+        effective_radius                                                                  UniformPrior, lower_limit = 0.0, upper_limit = 4.0
+        inclination                                                                       UniformPrior, lower_limit = 0.0, upper_limit = 90.0
+        phi                                                                               UniformPrior, lower_limit = 0.0, upper_limit = 180.0
+        turnover_radius                                                                   UniformPrior, lower_limit = 0.0, upper_limit = 1.0
+        maximum_velocity                                                                  UniformPrior, lower_limit = 25.0, upper_limit = 400.0
+        velocity_dispersion                                                               UniformPrior, lower_limit = 0.0, upper_limit = 100.0

@@ -114,54 +114,81 @@ class Analysis(af.Analysis):
             for tracer in tracers
         ]
 
-        inversions = {
-            "continuum":self.get_inversion_continuum(
-                mapper=mappers[0],
-                regularization=tracers[0].source_plane.regularization
-            )
-        }
-        # plt.figure()
-        # autolens_plot_utils.draw_voronoi_pixels(
-        #     mapper=inversions["continuum"].mapper,
-        #     values=inversions["continuum"].reconstruction,
-        # )
-        # plt.show()
-        # exit()
+        try:
+            n = 0
 
-        n = 1
-        for key in self.masked_datasets.keys():
-            if key == "continuum":
-                pass
-            elif key.startswith("region"):
-                if (tracers[0].source_plane.pixelization.shape == tracers[n].source_plane.pixelization.shape):
+            inversions = {
+                "continuum":self.get_inversion_continuum(
+                    mapper=mappers[0],
+                    regularization=tracers[0].source_plane.regularization
+                )
+                if self.masked_datasets["continuum"] is not None else None
+            }
+            # plt.figure()
+            # autolens_plot_utils.draw_voronoi_pixels(
+            #     mapper=inversions["continuum"].mapper,
+            #     values=inversions["continuum"].reconstruction,
+            # )
+            # plt.show()
+            # exit()
+
+            if inversions["continuum"] is not None:
+                n += 1
+
+            # TODO: After this point the code will crash if the region is the
+            # full cube. Need to fix this ...
+
+            for key in self.masked_datasets.keys():
+                if key.startswith("region"):
+
+                    if inversions["continuum"] is not None:
+                        continuum = True
+                        if (tracers[0].source_plane.pixelization.shape == tracers[n].source_plane.pixelization.shape):
+                            same_pixelization_shape = True
+                        else:
+                            raise ValueError("Not implemented yet")
+                    else:
+                        continuum = False
+
                     region_inversions = []
                     for i, transformer in enumerate(self.transformers[key]):
-                        print(key, i)
+                        #print(key, i)
 
                         transformed_mapping_matrices = transformer.transformed_mapping_matrices_from_mapping_matrix(
-                            mapping_matrix=inversions["continuum"].mapper.mapping_matrix
+                            mapping_matrix=mappers[n].mapping_matrix
                         )
 
-                        visibilities_continuum = mapped_reconstructed_visibilities(
-                            transformed_mapping_matrices=transformed_mapping_matrices,
-                            inversion=inversions["continuum"]
-                        )
+                        if continuum:
+                            visibilities_continuum = mapped_reconstructed_visibilities(
+                                transformed_mapping_matrices=transformed_mapping_matrices,
+                                inversion=inversions["continuum"]
+                            )
+
+                            visibilities=np.stack(
+                                arrays=(
+                                    np.subtract(
+                                        self.masked_datasets[key].visibilities[i, :, 0],
+                                        visibilities_continuum[:, 0]
+                                    ),
+                                    np.subtract(
+                                        self.masked_datasets[key].visibilities[i, :, 1],
+                                        visibilities_continuum[:, 1]
+                                    )
+                                ),
+                                axis=-1
+                            )
+                        else:
+                            visibilities=np.stack(
+                                arrays=(
+                                    self.masked_datasets[key].visibilities[i, :, 0],
+                                    self.masked_datasets[key].visibilities[i, :, 1]
+                                ),
+                                axis=-1
+                            )
 
                         region_inversions.append(
                             inv.InversionInterferometer.from_data_mapper_and_regularization_precomputed(
-                                visibilities=np.stack(
-                                    arrays=(
-                                        np.subtract(
-                                            self.masked_datasets[key].visibilities[i, :, 0],
-                                            visibilities_continuum[:, 0]
-                                        ),
-                                        np.subtract(
-                                            self.masked_datasets[key].visibilities[i, :, 1],
-                                            visibilities_continuum[:, 1]
-                                        )
-                                    ),
-                                    axis=-1
-                                ),
+                                visibilities=visibilities,
                                 noise_map=self.masked_datasets[key].noise_map[i],
                                 transformer=transformer,
                                 mapper=mappers[n],
@@ -171,36 +198,38 @@ class Analysis(af.Analysis):
                         )
 
                     inversions[key] = region_inversions
-                else:
-                    raise ValueError("Not implemented yet")
-                    # TODO: In the case where the 2 pixelizations do not have the
-                    # same number of pixels.
 
-                # autolens_plot_utils.plot_reconstructions_from_inversions(
-                #     inversions=inversions[key],
-                #     nrows=3,
-                #     ncols=5,
-                #     figsize=(12.5, 5),
-                #     xlim=(-1.5, 1.5),
-                #     ylim=(-1.5, 1.5),
-                # )
-                # exit()
+                    # autolens_plot_utils.plot_reconstructions_from_inversions(
+                    #     inversions=inversions[key],
+                    #     nrows=4,
+                    #     ncols=8,
+                    #     figsize=(12.5, 5),
+                    #     xlim=(-1.5, 1.5),
+                    #     ylim=(-1.5, 1.5),
+                    # )
+                    # exit()
 
-                n += 1
+                    n += 1
 
-        try:
+
             fits = {}
             for key in self.masked_datasets.keys():
                 if key == "continuum":
-                    fits[key] = self.fit_from_masked_dataset_model_data_and_inversion(
-                        masked_dataset=self.masked_datasets[key],
-                        model_data=inversions[key].mapped_reconstructed_visibilities,
-                        inversion=inversions[key]
-                    )
+                    if self.masked_datasets[key] is not None:
+                        fits[key] = self.fit_from_masked_dataset_model_data_and_inversion(
+                            masked_dataset=self.masked_datasets[key],
+                            model_data=inversions[key].mapped_reconstructed_visibilities,
+                            inversion=inversions[key]
+                        )
+                    else:
+                        fits[key] = None
                 elif key.startswith("region"):
                     region_fits = []
 
                     for i, inversion in enumerate(inversions[key]):
+                        # NOTE: Is there a more elegant way of creating individual
+                        # masked_datasets for every channel of the cube corresponding
+                        # to the line emission region.
                         region_fits.append(
                             self.fit_from_masked_dataset_model_data_and_inversion(
                                 masked_dataset=MaskedDatasetLite(
@@ -221,20 +250,26 @@ class Analysis(af.Analysis):
             figure_of_merit = 0.0
             for key in fits.keys():
                 if key == "continuum":
-                    figure_of_merit += fits[key].figure_of_merit
+                    if fits[key] is not None:
+                        figure_of_merit += fits[key].figure_of_merit
                 elif key.startswith("region"):
                     for fit in fits[key]:
                         figure_of_merit += fit.figure_of_merit
+                #print(key, figure_of_merit)
 
             self.n_tot += 1
             print(
-                "n = {}".format(self.n_tot)
+                "n = {}; figure of merit = {}".format(
+                    self.n_tot,
+                    figure_of_merit
+                )
             )
-
-            print("figure_of_merit = ", figure_of_merit)
 
             return figure_of_merit
         except InversionException as e:
+            print(
+                "An exception was raised."
+            )
             raise FitException from e
 
 

@@ -1,0 +1,78 @@
+Bayesian Evidence                                                                         -394594.61069416
+Maximum Likelihood                                                                        -387787.27137318
+
+Most Likely Model:
+
+galaxies
+    lens
+        mass
+            axis_ratio                                                                    0.751
+            phi                                                                           45.177
+            centre
+                centre_0                                                                  0.001
+                centre_1                                                                  0.010
+            einstein_radius                                                               1.001
+    subhalo
+        mass
+            mass_at_200                                                                   261371395.453
+            centre
+                centre_0                                                                  -0.447
+                centre_1                                                                  -0.865
+    source
+        light
+            axis_ratio                                                                    0.751
+            phi                                                                           44.898
+            effective_radius                                                              0.500
+            sersic_index                                                                  0.999
+            centre
+                centre_0                                                                  0.002
+                centre_1                                                                  0.009
+            intensity                                                                     0.001
+
+ WARNING: The chains have not converged enough to compute a PDF and model errors. 
+ The model below over estimates errors. 
+
+
+
+Most probable model (1.0 sigma limits):
+
+galaxies
+    lens
+        mass
+            axis_ratio                                                                    0.751 (0.750, 0.751)
+            phi                                                                           45.177 (45.156, 45.186)
+            centre
+                centre_0                                                                  0.001 (0.000, 0.001)
+                centre_1                                                                  0.010 (0.010, 0.011)
+            einstein_radius                                                               1.001 (1.001, 1.001)
+    subhalo
+        mass
+            mass_at_200                                                                   261371395.446 (209179068.051, 268952708.360)
+            centre
+                centre_0                                                                  -0.447 (-0.470, -0.406)
+                centre_1                                                                  -0.865 (-0.879, -0.815)
+    source
+        light
+            axis_ratio                                                                    0.751 (0.750, 0.751)
+            phi                                                                           44.898 (44.802, 44.950)
+            effective_radius                                                              0.500 (0.500, 0.500)
+            sersic_index                                                                  0.999 (0.999, 1.000)
+            centre
+                centre_0                                                                  0.002 (0.002, 0.003)
+                centre_1                                                                  0.009 (0.008, 0.009)
+            intensity                                                                     0.001 (0.001, 0.001)
+
+instances
+
+galaxies
+    lens
+        redshift                                                                          0.5
+        mass
+            slope                                                                         2.0
+    subhalo
+        redshift                                                                          0.5
+        mass
+            redshift_object                                                               0.5
+            redshift_source                                                               2.0
+    source
+        redshift                                                                          2.0

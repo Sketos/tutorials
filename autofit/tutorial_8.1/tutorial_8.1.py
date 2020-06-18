@@ -46,7 +46,7 @@ from astropy.io import fits
 sys.path.append(
     "{}/utils".format(os.environ["GitHub"])
 )
-import variable_utils as variable_utils
+import string_utils as string_utils
 import spectral_utils as spectral_utils
 import plot_utils as plot_utils
 
@@ -124,7 +124,8 @@ def region(n, n_min, n_max, invert=False):
 
 if __name__ == "__main__":
 
-    transformer_class = al.TransformerFINUFFT
+    transformer_class = al.TransformerNUFFT
+    #transformer_class = al.TransformerFINUFFT
 
     grid_3d = Grid3D(
         grid_2d=al.Grid.uniform(
@@ -170,7 +171,7 @@ if __name__ == "__main__":
         )
         transformers.append(transformer)
 
-    lens_mass_profile = mass_profiles.EllipticalPowerLaw(
+    lens_mass_profile = al.mp.EllipticalPowerLaw(
         centre=(0.0, 0.0),
         axis_ratio=0.75,
         phi=45.0,
@@ -231,6 +232,10 @@ if __name__ == "__main__":
                     mass=lens_mass_profile,
                 ),
                 al.Galaxy(
+                    redshift=lens_redshift,
+                    mass=subhalo_mass_profile,
+                ),
+                al.Galaxy(
                     redshift=source_redshift,
                     light=al.lp.LightProfile()
                 )
@@ -261,7 +266,7 @@ if __name__ == "__main__":
     #         shape=cube.shape
     #     ),
     #     ncols=8,
-    #     cube_contours=cube,
+    #     cube_contours=lensed_cube,
     # )
     # exit()
 
@@ -271,7 +276,8 @@ if __name__ == "__main__":
     dataset = Dataset(
         uv_wavelengths=uv_wavelengths,
         visibilities=np.add(
-            visibilities, noise_map
+            visibilities,
+            noise_map
         ),
         noise_map=noise_map,
         z_step_kms=z_step_kms
@@ -284,7 +290,7 @@ if __name__ == "__main__":
     #         invert=True
     #     ),
     #     ncols=8,
-    #     cube_contours=cube,
+    #     cube_contours=lensed_cube,
     #
     # )
     # exit()
@@ -300,23 +306,6 @@ if __name__ == "__main__":
         xy_mask=xy_mask,
     )
 
-    # ====== #
-    """
-    # NOTE: test
-    idx = np.zeros(
-        shape=(masked_dataset.visibilities.shape[0], ),
-        dtype=bool
-    )
-    for region in [emission_line_region]:
-        idx += region
-    print(idx)
-    exit()
-    """
-    # ====== #
-
-
-    # print(masked_dataset.uv_mask[masked_dataset.region].shape)
-    # exit()
 
     # pixelization_shape_0 = 20
     # pixelization_shape_1 = 20
@@ -370,7 +359,7 @@ if __name__ == "__main__":
 
     lens = al.GalaxyModel(
         redshift=lens_redshift,
-        mass=al.mp.EllipticalIsothermal,
+        mass=al.mp.EllipticalPowerLaw,
     )
 
     source_1 = al.GalaxyModel(
@@ -390,13 +379,19 @@ if __name__ == "__main__":
     source_1.pixelization.shape.shape_1 = af.UniformPrior(
         lower_limit=5, upper_limit=50
     )
+    source_1.regularization.coefficient = af.LogUniformPrior(
+        lower_limit=10**-6.0, upper_limit=10**8.0
+    )
 
     source_2.pixelization.shape = source_1.pixelization.shape
+    source_2.regularization.coefficient = af.LogUniformPrior(
+        lower_limit=10**-6.0, upper_limit=10**8.0
+    )
 
-    source_1.pixelization.shape = (15, 15)
+    #source_1.pixelization.shape = (15, 15)
     source_1.regularization.coefficient = 10.0
-    source_2.pixelization.shape = (15, 15)
-    source_2.regularization.coefficient = 100.0
+    #source_2.pixelization.shape = (15, 15)
+    # source_2.regularization.coefficient = 100.0
 
     lens.mass.centre_0 = 0.0
     lens.mass.centre_1 = 0.0
@@ -407,6 +402,17 @@ if __name__ == "__main__":
 
 
     phase_name = "phase_tutorial_8.1"
+
+    phase_folders = [
+        string_utils.remove_substring_from_end_of_string(
+            string=os.path.basename(__file__),
+            substring=".py"
+        )
+    ]
+
+    os.system(
+        "rm -r ./output/{}*".format(phase_name)
+    )
 
     # data_directory = "./data/{}".format(phase_name)
     # if not os.path.isdir(data_directory):
@@ -424,12 +430,9 @@ if __name__ == "__main__":
     #         data=getattr(dataset, _)
     #     )
 
-    os.system(
-        "rm -r ./output/{}*".format(phase_name)
-    )
     phase = ph.Phase(
         phase_name=phase_name,
-        phase_folders=[],
+        phase_folders=phase_folders,
         galaxies=dict(
             lens=lens,
             source_1=source_1,
@@ -441,9 +444,26 @@ if __name__ == "__main__":
         ]
     )
 
-    phase.optimizer.constant_efficiency = True
-    phase.optimizer.n_live_points = 2
-    phase.optimizer.sampling_efficiency = 0.5
+    # emission_line_region = Region.full(
+    #     n=n_channels,
+    # )
+    #
+    # phase = ph.Phase(
+    #     phase_name=phase_name,
+    #     phase_folders=[],
+    #     galaxies=dict(
+    #         lens=lens,
+    #         source_1=source_1,
+    #     ),
+    #     transformer_class=transformer_class,
+    #     regions=[
+    #         emission_line_region
+    #     ]
+    # )
+
+    phase.optimizer.const_efficiency_mode = True
+    phase.optimizer.n_live_points = 5
+    phase.optimizer.sampling_efficiency = 0.2
     phase.optimizer.evidence_tolerance = 100.0
 
     phase.run(

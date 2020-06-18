@@ -172,7 +172,7 @@ if __name__ == "__main__":
     )
     #non_linear_class=af.Emcee
 
-    phase.optimizer.constant_efficiency = True
+    phase.optimizer.const_efficiency_mode = True
     phase.optimizer.n_live_points = 100
     phase.optimizer.sampling_efficiency = 0.5
     phase.optimizer.evidence_tolerance = 100.0

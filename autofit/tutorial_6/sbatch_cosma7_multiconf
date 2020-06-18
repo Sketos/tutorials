@@ -1,0 +1,26 @@
+#!/bin/bash -l
+
+#SBATCH -N 1
+#SBATCH -J autofit_tutorial_6
+#SBATCH -o /cosma/home/durham/dc-amvr1/GitHub/tutorials/autofit/tutorial_6/output_%A.out
+#SBATCH -e /cosma/home/durham/dc-amvr1/GitHub/tutorials/autofit/tutorial_6/error_%A.err
+#SBATCH -p cosma7
+#SBATCH -A dp004
+#SBATCH --exclusive
+#SBATCH -t 72:00:00
+#SBATCH --mail-type=END
+#SBATCH --mail-user=aristeidis.amvrosiadis@durham.ac.uk
+
+module purge
+module load python/3.6.5
+module load intel_comp/2018
+module load openmpi/3.0.1
+module load fftw/3.3.7
+source $HOME/autolens_envs/autolens_0.45.0_modified/bin/activate
+
+export OMP_NUM_THREADS=1
+
+export OPENBLAS_NUM_THREADS=4
+export MKL_NUM_THREADS=4
+
+srun -n 16 --multi-prog multiconf.conf

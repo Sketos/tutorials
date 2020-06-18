@@ -8,7 +8,7 @@ sys.path.append(
 )
 
 from src.plot import (
-    fit_plots
+    dataset_plots, fit_plots
 )
 
 class AbstractVisualizer:
@@ -26,18 +26,14 @@ class Visualizer(AbstractVisualizer):
 
         self.transformers = transformers
 
-        # dataset_plots.data(
-        #     dataset=masked_dataset,
-        #     output_filename="dataset_data",
-        #     output_path=self.image_path,
-        #     output_format="png",
-        # )
-        # dataset_plots.noise_map(
-        #     dataset=masked_dataset,
-        #     output_filename="dataset_noise_map",
-        #     output_path=self.image_path,
-        #     output_format="png",
-        # )
+
+        dataset_plots.data(
+            masked_dataset=masked_dataset,
+            transformers=self.transformers,
+            output_filename="data",
+            output_path=self.image_path,
+            output_format="png",
+        )
 
     def visualize_fit(self, fit, during_analysis):
 

@@ -1,0 +1,106 @@
+Bayesian Evidence                                                                         -43213.96699519
+Maximum Likelihood                                                                        -43098.82594338
+
+Most Likely Model:
+
+profiles
+    lens
+        axis_ratio                                                                        0.749
+        phi                                                                               45.033
+        centre
+            centre_0                                                                      -0.001
+            centre_1                                                                      -0.001
+        einstein_radius                                                                   1.002
+    source_1
+        axis_ratio                                                                        0.748
+        phi                                                                               44.979
+        effective_radius                                                                  0.495
+        sersic_index                                                                      0.992
+        centre
+            centre_0                                                                      0.002
+            centre_1                                                                      0.001
+        intensity                                                                         0.000
+    source_2
+        effective_radius                                                                  0.498
+        inclination                                                                       29.841
+        phi                                                                               49.991
+        turnover_radius                                                                   0.050
+        centre
+            centre_0                                                                      -0.000
+            centre_1                                                                      0.000
+        z_centre                                                                          15.995
+        intensity                                                                         4.978
+        maximum_velocity                                                                  201.225
+        velocity_dispersion                                                               49.807
+
+
+Most probable model (3.0 sigma limits):
+
+profiles
+    lens
+        axis_ratio                                                                        0.749 (0.748, 0.749)
+        phi                                                                               45.024 (44.989, 45.060)
+        centre
+            centre_0                                                                      -0.001 (-0.001, -0.001)
+            centre_1                                                                      -0.001 (-0.001, -0.000)
+        einstein_radius                                                                   1.002 (1.002, 1.002)
+    source_1
+        axis_ratio                                                                        0.749 (0.746, 0.752)
+        phi                                                                               44.945 (44.525, 45.341)
+        effective_radius                                                                  0.496 (0.493, 0.499)
+        sersic_index                                                                      0.994 (0.989, 0.998)
+        centre
+            centre_0                                                                      0.002 (0.001, 0.002)
+            centre_1                                                                      0.001 (0.001, 0.002)
+        intensity                                                                         0.000 (0.000, 0.000)
+    source_2
+        effective_radius                                                                  0.498 (0.498, 0.499)
+        inclination                                                                       29.854 (29.799, 29.915)
+        phi                                                                               49.993 (49.965, 50.021)
+        turnover_radius                                                                   0.050 (0.050, 0.050)
+        centre
+            centre_0                                                                      -0.000 (-0.000, -0.000)
+            centre_1                                                                      0.000 (-0.000, 0.000)
+        z_centre                                                                          15.995 (15.994, 15.996)
+        intensity                                                                         4.979 (4.971, 4.986)
+        maximum_velocity                                                                  201.105 (200.693, 201.473)
+        velocity_dispersion                                                               49.833 (49.741, 49.918)
+
+
+Most probable model (1.0 sigma limits):
+
+profiles
+    lens
+        axis_ratio                                                                        0.749 (0.748, 0.749)
+        phi                                                                               45.024 (45.012, 45.036)
+        centre
+            centre_0                                                                      -0.001 (-0.001, -0.001)
+            centre_1                                                                      -0.001 (-0.001, -0.001)
+        einstein_radius                                                                   1.002 (1.002, 1.002)
+    source_1
+        axis_ratio                                                                        0.749 (0.748, 0.750)
+        phi                                                                               44.945 (44.816, 45.082)
+        effective_radius                                                                  0.496 (0.495, 0.497)
+        sersic_index                                                                      0.994 (0.992, 0.995)
+        centre
+            centre_0                                                                      0.002 (0.002, 0.002)
+            centre_1                                                                      0.001 (0.001, 0.002)
+        intensity                                                                         0.000 (0.000, 0.000)
+    source_2
+        effective_radius                                                                  0.498 (0.498, 0.499)
+        inclination                                                                       29.854 (29.836, 29.870)
+        phi                                                                               49.993 (49.984, 50.001)
+        turnover_radius                                                                   0.050 (0.050, 0.050)
+        centre
+            centre_0                                                                      -0.000 (-0.000, -0.000)
+            centre_1                                                                      0.000 (0.000, 0.000)
+        z_centre                                                                          15.995 (15.995, 15.996)
+        intensity                                                                         4.979 (4.976, 4.981)
+        maximum_velocity                                                                  201.105 (201.002, 201.232)
+        velocity_dispersion                                                               49.833 (49.806, 49.857)
+
+instances
+
+profiles
+    lens
+        slope                                                                             2.0

@@ -99,6 +99,10 @@ class Phase(af.AbstractPhase):
                 idx += region.idx
                 args["region_{}".format(i)] = {}
 
+            if all(idx):
+                continuum = False
+            else:
+                continuum = True
 
             argspec = inspect.getargspec(MaskedDatasetLite.__init__)
 
@@ -108,15 +112,16 @@ class Phase(af.AbstractPhase):
                     if hasattr(masked_dataset, argname):
                         array = getattr(masked_dataset, argname)
 
-                        args["continuum"][argname] = reshape_array(
-                            array=array[~idx]
-                        )
+                        if continuum:
+                            args["continuum"][argname] = reshape_array(
+                                array=array[~idx]
+                            )
 
                         for i, region in enumerate(regions):
                             args["region_{}".format(i)][argname] = array[region.idx]
 
             masked_datasets = {
-                "continuum":MaskedDatasetLite(**args["continuum"])
+                "continuum":MaskedDatasetLite(**args["continuum"]) if continuum else None
             }
             for i, region in enumerate(regions):
                 masked_datasets["region_{}".format(i)] = MaskedDatasetLite(**args["region_{}".format(i)])
@@ -139,10 +144,13 @@ class Phase(af.AbstractPhase):
         transformers = {}
         for key in masked_datasets.keys():
             if key == "continuum":
-                transformers[key] = self.transformer_class(
-                    uv_wavelengths=masked_datasets[key].uv_wavelengths,
-                    grid=masked_dataset.grid_3d.grid_2d.in_radians
-                )
+                if masked_datasets[key] is not None:
+                    transformers[key] = self.transformer_class(
+                        uv_wavelengths=masked_datasets[key].uv_wavelengths,
+                        grid=masked_dataset.grid_3d.grid_2d.in_radians
+                    )
+                else:
+                    transformers[key] = None
             elif key.startswith("region"):
                 region_transformers = []
                 for i in range(masked_datasets[key].uv_wavelengths.shape[0]):

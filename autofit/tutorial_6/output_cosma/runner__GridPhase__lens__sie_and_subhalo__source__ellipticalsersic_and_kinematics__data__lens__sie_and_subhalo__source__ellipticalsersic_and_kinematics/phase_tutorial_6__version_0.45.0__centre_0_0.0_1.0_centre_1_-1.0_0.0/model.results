@@ -1,0 +1,90 @@
+Bayesian Evidence                                                                         -91088312.58995615
+Maximum Likelihood                                                                        -53872484.22636259
+
+Most Likely Model:
+
+profiles
+    lens
+        axis_ratio                                                                        0.265
+        phi                                                                               70.892
+        centre
+            centre_0                                                                      0.282
+            centre_1                                                                      0.186
+        einstein_radius                                                                   1.025
+    source_1
+        axis_ratio                                                                        0.580
+        phi                                                                               100.352
+        effective_radius                                                                  3.144
+        sersic_index                                                                      0.743
+        centre
+            centre_0                                                                      0.240
+            centre_1                                                                      -0.124
+        intensity                                                                         0.000
+    source_2
+        effective_radius                                                                  0.451
+        inclination                                                                       31.474
+        phi                                                                               78.228
+        turnover_radius                                                                   0.411
+        centre
+            centre_0                                                                      0.120
+            centre_1                                                                      -0.245
+        z_centre                                                                          16.987
+        intensity                                                                         2.829
+        maximum_velocity                                                                  90.022
+        velocity_dispersion                                                               68.987
+    subhalo
+        mass_at_200                                                                       329522963.697
+        centre
+            centre_0                                                                      0.717
+            centre_1                                                                      -0.568
+
+ WARNING: The chains have not converged enough to compute a PDF and model errors. 
+ The model below over estimates errors. 
+
+
+
+Most probable model (1.0 sigma limits):
+
+profiles
+    lens
+        axis_ratio                                                                        0.265 (0.224, 0.984)
+        phi                                                                               70.892 (0.407, 179.282)
+        centre
+            centre_0                                                                      0.282 (-0.420, 0.515)
+            centre_1                                                                      0.186 (-0.670, 0.444)
+        einstein_radius                                                                   1.025 (0.864, 1.243)
+    source_1
+        axis_ratio                                                                        0.580 (0.218, 0.975)
+        phi                                                                               100.352 (5.749, 178.839)
+        effective_radius                                                                  3.144 (0.004, 3.643)
+        sersic_index                                                                      0.743 (0.596, 7.948)
+        centre
+            centre_0                                                                      0.240 (-0.690, 0.600)
+            centre_1                                                                      -0.124 (-0.557, 0.681)
+        intensity                                                                         0.000 (0.000, 0.000)
+    source_2
+        effective_radius                                                                  0.451 (0.116, 3.959)
+        inclination                                                                       31.474 (2.603, 89.348)
+        phi                                                                               78.228 (2.923, 179.886)
+        turnover_radius                                                                   0.411 (0.026, 0.981)
+        centre
+            centre_0                                                                      0.120 (-0.494, 0.545)
+            centre_1                                                                      -0.245 (-0.529, 0.573)
+        z_centre                                                                          16.987 (10.816, 19.945)
+        intensity                                                                         2.829 (0.010, 25.091)
+        maximum_velocity                                                                  90.022 (26.421, 389.629)
+        velocity_dispersion                                                               68.987 (0.329, 99.380)
+    subhalo
+        mass_at_200                                                                       329522963.361 (1033538.861, 8205345315.229)
+        centre
+            centre_0                                                                      0.717 (0.037, 0.993)
+            centre_1                                                                      -0.568 (-0.999, -0.042)
+
+instances
+
+profiles
+    lens
+        slope                                                                             2.0
+    subhalo
+        redshift_object                                                                   0.5
+        redshift_source                                                                   2.0

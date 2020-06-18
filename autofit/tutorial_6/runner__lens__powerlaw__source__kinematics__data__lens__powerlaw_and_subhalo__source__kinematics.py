@@ -134,7 +134,6 @@ if __name__ == "__main__":
         redshift_source=source_redshift
     )
 
-
     src_model = profiles.Kinematical(
         centre=(0.0, 0.0),
         z_centre=16.0,
@@ -195,7 +194,7 @@ if __name__ == "__main__":
 
 
     noise_map = np.random.normal(
-        loc=0.0, scale=1.0 * 10**-1.0, size=visibilities.shape
+        loc=0.0, scale=5.0 * 10**-1.0, size=visibilities.shape
     )
     dataset = Dataset(
         uv_wavelengths=uv_wavelengths,
@@ -220,7 +219,10 @@ if __name__ == "__main__":
         lower_limit=0.85,
         upper_limit=1.25
     )
-    lens_model.slope = 2.0
+    lens_model.slope = af.UniformPrior(
+        lower_limit=1.5,
+        upper_limit=2.5
+    )
 
 
     src_model = af.PriorModel(profiles.Kinematical)
@@ -270,10 +272,10 @@ if __name__ == "__main__":
         source_redshift=source_redshift,
     )
 
-    phase_1.optimizer.constant_efficiency = True
+    phase_1.optimizer.const_efficiency_mode = True
     phase_1.optimizer.n_live_points = 100
-    phase_1.optimizer.sampling_efficiency = 0.5
-    phase_1.optimizer.evidence_tolerance = 100.0
+    phase_1.optimizer.sampling_efficiency = 0.2
+    phase_1.optimizer.evidence_tolerance = 0.5
 
     xy_mask = Mask3D.unmasked(
         shape_3d=grid_3d.shape_3d,

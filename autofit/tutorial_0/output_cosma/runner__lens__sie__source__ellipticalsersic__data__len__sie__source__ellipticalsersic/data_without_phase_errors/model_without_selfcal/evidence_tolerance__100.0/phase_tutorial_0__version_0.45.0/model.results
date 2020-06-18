@@ -1,0 +1,80 @@
+Bayesian Evidence                                                                         119076.11960058
+Maximum Likelihood                                                                        119205.17654621
+
+Most Likely Model:
+
+galaxies
+    lens
+        mass
+            axis_ratio                                                                    0.750
+            phi                                                                           45.000
+            centre
+                centre_0                                                                  -0.000
+                centre_1                                                                  -0.000
+            einstein_radius                                                               1.000
+    source
+        light
+            axis_ratio                                                                    0.750
+            phi                                                                           44.999
+            effective_radius                                                              0.500
+            sersic_index                                                                  1.000
+            centre
+                centre_0                                                                  -0.000
+                centre_1                                                                  -0.000
+            intensity                                                                     0.001
+
+
+Most probable model (3.0 sigma limits):
+
+galaxies
+    lens
+        mass
+            axis_ratio                                                                    0.750 (0.750, 0.750)
+            phi                                                                           44.999 (44.998, 45.001)
+            centre
+                centre_0                                                                  -0.000 (-0.000, 0.000)
+                centre_1                                                                  0.000 (-0.000, 0.000)
+            einstein_radius                                                               1.000 (1.000, 1.000)
+    source
+        light
+            axis_ratio                                                                    0.750 (0.750, 0.750)
+            phi                                                                           44.999 (44.996, 45.002)
+            effective_radius                                                              0.500 (0.500, 0.500)
+            sersic_index                                                                  1.000 (1.000, 1.000)
+            centre
+                centre_0                                                                  0.000 (-0.000, 0.000)
+                centre_1                                                                  0.000 (-0.000, 0.000)
+            intensity                                                                     0.001 (0.001, 0.001)
+
+
+Most probable model (1.0 sigma limits):
+
+galaxies
+    lens
+        mass
+            axis_ratio                                                                    0.750 (0.750, 0.750)
+            phi                                                                           44.999 (44.999, 45.000)
+            centre
+                centre_0                                                                  -0.000 (-0.000, 0.000)
+                centre_1                                                                  0.000 (-0.000, 0.000)
+            einstein_radius                                                               1.000 (1.000, 1.000)
+    source
+        light
+            axis_ratio                                                                    0.750 (0.750, 0.750)
+            phi                                                                           44.999 (44.998, 45.000)
+            effective_radius                                                              0.500 (0.500, 0.500)
+            sersic_index                                                                  1.000 (1.000, 1.000)
+            centre
+                centre_0                                                                  0.000 (-0.000, 0.000)
+                centre_1                                                                  0.000 (-0.000, 0.000)
+            intensity                                                                     0.001 (0.001, 0.001)
+
+instances
+
+galaxies
+    lens
+        redshift                                                                          0.5
+        mass
+            slope                                                                         2.0
+    source
+        redshift                                                                          2.0

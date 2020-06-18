@@ -1,0 +1,57 @@
+Bayesian Evidence                                                                         -810186.50716504
+Maximum Likelihood                                                                        -810171.00504745
+
+Most Likely Model:
+
+galaxies
+    source_2
+        pixelization
+            shape
+                shape_0                                                                   37.592
+                shape_1                                                                   8.042
+        regularization
+            coefficient                                                                   1745.776
+
+
+Most probable model (3.0 sigma limits):
+
+galaxies
+    source_2
+        pixelization
+            shape
+                shape_0                                                                   37.542 (7.952, 8.339)
+                shape_1                                                                   8.130 (7.952, 8.339)
+        regularization
+            coefficient                                                                   1719.215 (1466.095, 1928.992)
+
+
+Most probable model (1.0 sigma limits):
+
+galaxies
+    source_2
+        pixelization
+            shape
+                shape_0                                                                   37.542 (8.037, 8.217)
+                shape_1                                                                   8.130 (8.037, 8.217)
+        regularization
+            coefficient                                                                   1719.215 (1620.585, 1891.996)
+
+instances
+
+galaxies
+    lens
+        redshift                                                                          0.5
+        mass
+            centre
+                centre_0                                                                  0.0
+                centre_1                                                                  0.0
+            axis_ratio                                                                    0.75
+            phi                                                                           45.0
+            einstein_radius                                                               1.0
+            slope                                                                         2.0
+    source_1
+        redshift                                                                          2.0
+        regularization
+            coefficient                                                                   10.0
+    source_2
+        redshift                                                                          2.0

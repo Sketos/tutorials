@@ -326,7 +326,7 @@ if __name__ == "__main__":
     # exit()
 
     noise_map = np.random.normal(
-        loc=0.0, scale=1.0 * 10**-1.0, size=visibilities.shape
+        loc=0.0, scale=5.0 * 10**-1.0, size=visibilities.shape
     )
     dataset = Dataset(
         uv_wavelengths=uv_wavelengths,
@@ -336,31 +336,30 @@ if __name__ == "__main__":
         noise_map=noise_map,
         z_step_kms=z_step_kms
     )
-    plot_utils.plot_cube(
-        cube=autolens_plot_utils.dirty_cube_from_visibilities(
-            visibilities=dataset.visibilities,
-            transformers=transformers,
-            shape=cube.shape,
-            invert=True
-        ),
-        ncols=8,
-        extent=grid_3d.extent,
-        points=[
-            plot_utils.Point(
-                y=subhalo_mass_profile.centre[0],
-                x=subhalo_mass_profile.centre[1],
-                color="black"
-            ),
-            plot_utils.Point(
-                y=lens_mass_profile.centre[0],
-                x=lens_mass_profile.centre[1],
-                color="white"
-            ),
-
-        ],
-        #cube_contours=lensed_cube,
-    )
-    exit()
+    # plot_utils.plot_cube(
+    #     cube=autolens_plot_utils.dirty_cube_from_visibilities(
+    #         visibilities=dataset.visibilities,
+    #         transformers=transformers,
+    #         shape=cube.shape
+    #     ),
+    #     ncols=8,
+    #     extent=grid_3d.extent,
+    #     points=[
+    #         plot_utils.Point(
+    #             y=subhalo_mass_profile.centre[0],
+    #             x=subhalo_mass_profile.centre[1],
+    #             color="black"
+    #         ),
+    #         plot_utils.Point(
+    #             y=lens_mass_profile.centre[0],
+    #             x=lens_mass_profile.centre[1],
+    #             color="white"
+    #         ),
+    #
+    #     ],
+    #     #cube_contours=lensed_cube,
+    # )
+    # exit()
 
     # NOTE: Plotting visibilities
     # for i in range(dataset.visibilities.shape[0]):
@@ -448,11 +447,11 @@ if __name__ == "__main__":
     )
 
     # NOTE: example 1
-    #lens_model.centre_0 = 0.0
-    #lens_model.centre_1 = 0.0
-    #lens_model.axis_ratio = 0.75
-    #lens_model.phi = 45.0
-    #lens_model.einstein_radius = 1.0
+    lens_model.centre_0 = 0.0
+    lens_model.centre_1 = 0.0
+    lens_model.axis_ratio = 0.75
+    lens_model.phi = 45.0
+    lens_model.einstein_radius = 1.0
     lens_model.slope = 2.0
 
     src_model_1.centre_0 = 0.0
@@ -471,15 +470,22 @@ if __name__ == "__main__":
     src_model_2.inclination = 30.0
     src_model_2.phi = 50.0
     src_model_2.turnover_radius = 0.05
-    #src_model_2.maximum_velocity = 200.0
+    src_model_2.maximum_velocity = 200.0
     #src_model_2.velocity_dispersion = 50.0
 
-    # exit()
-    phase_folders = ["test"]
+    # phase_folders = [
+    #     string_utils.remove_substring_from_end_of_string(
+    #         string=os.path.basename(__file__),
+    #         substring=".py"
+    #     )
+    # ]
+    phase_folders = []
+
     phase_1_name = "phase_tutorial_6__version_{}".format(autolens_version)
     # os.system(
     #     "rm -r output/{}".format(phase_1_name)
     # )
+
     phase_1 = phase.Phase(
         phase_name=phase_1_name,
         phase_folders=phase_folders,
@@ -495,10 +501,10 @@ if __name__ == "__main__":
         ]
     )
 
-    phase_1.optimizer.constant_efficiency = True
+    phase_1.optimizer.const_efficiency_mode = True
     phase_1.optimizer.n_live_points = 100
-    phase_1.optimizer.sampling_efficiency = 0.5
-    phase_1.optimizer.evidence_tolerance = 100.0
+    phase_1.optimizer.sampling_efficiency = 0.2
+    phase_1.optimizer.evidence_tolerance = 0.5
 
     phase_1.run(
         dataset=dataset,
